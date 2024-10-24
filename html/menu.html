@@ -1,0 +1,31 @@
+<!-- menu.html -->
+<div id="welcome-screen" style="display: none;">
+    <h1>Bienvenido al sistema de gestión de procesos judiciales "Gestor Legal"</h1>
+    <button id="open-modal-btn">Abrir Módulos</button>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Módulos Disponibles</h2>
+        <div class="modules-container">
+            <div class="module" onclick="moduleSelected('Gestión de Casos')">
+                <img src="images/casos.png" alt="Gestión de Casos">
+                <p>Módulo de gestión de casos</p>
+            </div>
+            <div class="module" onclick="moduleSelected('Honorarios')">
+                <img src="images/honorarios.png" alt="Honorarios">
+                <p>Módulo de honorarios</p>
+            </div>
+            <div class="module" onclick="moduleSelected('Seguimiento')">
+                <img src="images/seguimiento.png" alt="Seguimiento">
+                <p>Módulo de seguimiento</p>
+            </div>
+            <div class="module" onclick="moduleSelected('Reportes')">
+                <img src="images/reportes.png" alt="Reportes">
+                <p>Módulo de generación de reportes y análisis de datos</p>
+            </div>
+        </div>
+    </div>
+</div>

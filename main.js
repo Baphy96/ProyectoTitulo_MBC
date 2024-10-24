@@ -60,7 +60,9 @@ loginForm.addEventListener('submit', (e) => {
             const user = userCredential.user;
             authMessage.textContent = `Inicio de sesión exitoso: ${user.email}`;
             loginForm.reset();
-            // Aquí puedes redirigir al usuario a otra página o cargar el contenido principal
+            
+            // Redirigir al usuario al menú después de iniciar sesión exitoso
+            window.location.href = 'html/mnu.html'; // Cambia 'html/mnu.html' por la ruta correcta si es diferente
         })
         .catch((error) => {
             intentosFallidos++;
@@ -91,6 +93,7 @@ function cerrarSesion() {
         .then(() => {
             console.log('Cierre de sesión exitoso');
             // Redirigir al usuario a la página de inicio de sesión
+            window.location.href = 'index.html'; // Redirigir de vuelta al inicio de sesión
         })
         .catch((error) => {
             console.error('Error al cerrar sesión:', error.message);
@@ -125,4 +128,5 @@ document.getElementById('login-tab').addEventListener('click', function () {
     this.classList.add('active');
     document.getElementById('register-tab').classList.remove('active');
 });
+
 
