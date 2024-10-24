@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticación de Usuarios</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div id="auth-container">
+        <div class="tabs">
+            <a href="#" id="register-tab" class="active">Regístrate</a>
+            <a href="#" id="login-tab">Inicia sesión</a>
+        </div>
+
+        <!-- Sección de Registro -->
+        <form id="register-form" class="active">
+            <input type="email" class="input-field" id="register-email" placeholder="Correo electrónico" required>
+            <input type="password" class="input-field" id="register-password" placeholder="Contraseña" required>
+            <button type="submit" class="login-button">Registrarse</button>
+        </form>
+        
+        <!-- Sección de Inicio de Sesión -->
+        <form id="login-form" class="hidden">
+            <input type="email" class="input-field" id="login-email" placeholder="Correo electrónico" required>
+            <input type="password" class="input-field" id="login-password" placeholder="Contraseña" required>
+            <a href="#" class="forgot-password">¿Has olvidado tu contraseña?</a>
+            <button type="submit" class="login-button">Iniciar Sesión</button>
+        </form>         
+            </div>
+        </div>
+
+        <script src="scripts/main.js"></script>
+    </div>
+    
+       <!-- Pantalla de Bienvenida -->
+       <div id="welcome-screen" style="display: none;">
+        <h1>Bienvenido al sistema de gestión de procesos judiciales "Gestor Legal"</h1>
+        <button id="open-modal-btn">Abrir Módulos</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Módulos Disponibles</h2>
+            <div class="modules-container">
+                <div class="module" onclick="moduleSelected('Gestión de Casos')">
+                    <img src="images/casos.png" alt="Gestión de Casos">
+                    <p>Módulo de gestión de casos</p>
+                </div>
+                <div class="module" onclick="moduleSelected('Honorarios')">
+                    <img src="images/honorarios.png" alt="Honorarios">
+                    <p>Módulo de honorarios</p>
+                </div>
+                <div class="module" onclick="moduleSelected('Seguimiento')">
+                    <img src="images/seguimiento.png" alt="Seguimiento">
+                    <p>Módulo de seguimiento</p>
+                </div>
+                <div class="module" onclick="moduleSelected('Reportes')">
+                    <img src="images/reportes.png" alt="Reportes">
+                    <p>Módulo de generación de reportes y análisis de datos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-message"></div>
+
+    <!-- Scripts de Firebase y Configuración -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+    <script src="config/firebaseConfig.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/modal.js"></script>
+
+</body>
+</html>
+
