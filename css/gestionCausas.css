@@ -1,0 +1,208 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+}
+
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.filter-section {
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-bottom: 2px solid #bdc3c7;
+}
+
+.filter-section form {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.filter-section label {
+    margin-right: 0.1rem;
+    flex-basis: 100%;
+    font-size: 0.9rem;/* Tamaño de fuente más pequeño para las etiquetas */
+}
+
+input, button {
+    padding: 10px;
+    font-size: 0.9rem; /* Tamaño de fuente más pequeño para los campos de entrada y botones */
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.results-section {
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #bdc3c7;
+    text-align: center;
+}
+
+th {
+    background-color: #34495e;
+    color: white;
+}
+
+#addCause {
+    display: block;
+    margin: 0,5px auto 10px auto; /* Centra el botón, añade margen inferior y disminuye el margen superior*/;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* Estilos del modal */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro semitransparente */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 80vh;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    cursor: pointer;
+}
+
+/* Organización de filas y columnas en el formulario */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas por defecto */
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Clase específica para filas de una sola columna */
+.full-width-row {
+    grid-template-columns: 1fr; /* Una sola columna */
+}
+
+/* Hacer que .full-width ocupe todo el ancho de la fila */
+.full-width {
+    grid-column: span 2;
+}
+
+/* Botones "Agregar" (+) */
+.add-button {
+    background-color: #39c5be;
+    color: white;
+    border: none;
+    padding: 4px; /* Ajusta el padding para reducir el tamaño */
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px; /* Cuadrado */
+    width: 5px; /* Ajusta el ancho */
+    height: 25px; /* Ajusta la altura */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-button:hover {
+    background-color: #92ebf3;
+}
+
+/* Estilos de etiquetas y campos en el formulario */
+.modal-content label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.modal-content select,
+.modal-content input,
+.modal-content button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+/* Alineación de los botones Guardar y Honorarios */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.form-actions button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#honorariosButton {
+    background-color: #3498db;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#honorariosButton:hover {
+    background-color: #2980b9;
+}
+

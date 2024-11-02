@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Causas</title>
+    <link rel="stylesheet" href="../css/gestionCausas.css">
+    <link rel="stylesheet" href="../css/menu.css"> <!-- Estilos de barra lateral -->
+    <link rel="stylesheet" href="../css/gestionCausas.css"> <!-- Estilos de la interfaz de gestión de causas -->
+</head>
+<body>
+
+    <!-- Barra lateral (copiada de menu.html) -->
+    <div class="sidebar">
+        <h2 style="text-align: center;">MBC<br> Abogados S.A</h2>
+        <ul>
+            <li><a href="menu.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#" class="active"><i class="fas fa-gavel"></i> Gestión de Causas</a></li>
+            <li><a href="honorarios.html"><i class="fas fa-dollar-sign"></i> Honorarios</a></li>
+            <li><a href="seguimiento.html"><i class="fas fa-calendar-alt"></i> Seguimiento</a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
+            <li><a href="mantenedores.html"><i class="fas fa-tools"></i> Mantenedores</a></li>
+        </ul>
+        <div class="footer">
+            <a href="#"><i class="far fa-question-circle"></i> Ayuda</a><br>
+            <a href="#" id="logout"><i class="fas fa-door-open"></i> Salir</a>
+        </div>
+    </div>
+
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <header>
+            <h1>Gestión de Causas</h1>
+        </header>
+        
+    <main>
+        <section class="filter-section">
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="periodoDesde">Periodo Desde:</label>
+                    <input type="date" id="periodoDesde" name="periodoDesde">
+                </div>
+        
+                <div class="form-group">
+                    <label for="periodoHasta">Periodo Hasta:</label>
+                    <input type="date" id="periodoHasta" name="periodoHasta">
+                </div>
+        
+                <div class="form-group">
+                    <label for="rol">RIT / ROL:</label>
+                    <input type="text" id="rol" name="rol" placeholder="Ej: 543-2024">
+                </div>
+        
+                <div class="form-group">
+                    <label for="otroTipo">Otro tipo de búsqueda:</label>
+                    <input type="text" id="buscador" name="rut" placeholder="Rut, Nombre, Tribunal, Abogado, Estado">
+                </div>
+        
+                <button type="submit" id="buscar">Buscar</button>
+                <button type="button" id="exportar">Exportar</button>
+            </form>
+        </section>
+
+        <section class="results-section">
+            <button id="addCause">Agregar Nueva Causa</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rut Cliente</th>
+                        <th>Nombre Cliente</th>
+                        <th>ROL / Año</th>
+                        <th>Fecha de Ingreso</th>
+                        <th>Tribunal</th>
+                        <th>Abogado Responsable</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                    <!-- Resultados se cargarán aquí -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script type="module" src="../scripts/gestionCausas.js"></script>
+
+<!-- Modal para agregar nueva causa -->
+<div id="addCauseModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Agregar Nueva Causa</h2>
+        <form id="newCauseForm">
+
+            <!-- Fila 1: Cliente -->
+            <div class="form-row full-width-row">
+                <label for="cliente">Cliente:</label>
+                <div class="select-group">
+                    <select id="cliente" name="cliente" required>
+                        <option value="">Seleccione un cliente</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                    <button type="button" class="add-button">+</button>
+                </div>
+            </div>
+        
+            <!-- Fila 2: Abogado Responsable y Asistentes Legales -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="abogadoResponsable">Abogado Responsable:</label>
+                    <select id="abogadoResponsable" name="abogadoResponsable" required>
+                        <option value="">Seleccione un abogado responsable</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+                <div class="form-column">
+                    <label for="asistentesLegales">Asistentes Legales Asignados:</label>
+                    <select id="asistentesLegales" name="asistentesLegales" multiple required>
+                        <option value="">Seleccione asistentes legales</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+            </div>
+        
+            <!-- Fila 3: ROL / Año y Demandado -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="rol">ROL / Año:</label>
+                    <input type="text" id="rol" name="rol" placeholder="Ej: 543-2024" required>
+                </div>
+                <div class="form-column">
+                    <label for="demandado">Demandado:</label>
+                    <input type="text" id="demandado" name="demandado" placeholder="Nombre del Demandado" required>
+                </div>
+            </div>
+        
+            <!-- Fila 4: Fecha de Ingreso y Tipo de Servicio -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="fechaIngreso">Fecha de Ingreso:</label>
+                    <input type="date" id="fechaIngreso" name="fechaIngreso" required>
+                </div>
+                <div class="form-column">
+                    <label for="tipoServicio">Tipo de Servicio:</label>
+                    <select id="tipoServicio" name="tipoServicio" required>
+                        <option value="">Seleccione un tipo de servicio</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+            </div>
+        
+            <!-- Fila 5: Tribunal -->
+            <div class="form-row full-width-row">
+                <label for="tribunal">Tribunal:</label>
+                <select id="tribunal" name="tribunal" required>
+                    <option value="">Seleccione un tribunal</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+        
+            <!-- Fila 6: Receptor Judicial y Abogado Coordinador -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="receptorJudicial">Receptor Judicial:</label>
+                    <div class="select-group">
+                        <select id="receptorJudicial" name="receptorJudicial" required>
+                            <option value="">Seleccione un receptor</option>
+                            <!-- Opciones dinámicas -->
+                        </select>
+                        <button type="button" class="add-button">+</button>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <label for="abogadoCoordinador">Abogado Coordinador:</label>
+                    <div class="select-group">
+                        <select id="abogadoCoordinador" name="abogadoCoordinador" required>
+                            <option value="">Seleccione un abogado coordinador</option>
+                            <!-- Opciones dinámicas -->
+                        </select>
+                        <button type="button" class="add-button">+</button>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Fila 7: Estado -->
+            <div class="form-row full-width-row">
+                <label for="estado">Estado:</label>
+                <select id="estado" name="estado" required>
+                    <option value="">Seleccione un estado</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+        
+            <!-- Fila 8: Botones Guardar y Honorarios -->
+            <div class="form-row form-actions">
+                <button type="submit">Guardar Causa</button>
+                <button type="button" id="honorariosButton">Honorarios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para agregar honorarios -->
+<div id="honorariosModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Agregar Honorarios</h2>
+        <form id="honorariosForm">
+            <!-- Fila 1: RUT Cliente, Nombre Cliente, ROL / Año -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="rutClienteHonorarios">Rut de Cliente:</label>
+                    <input type="text" id="rutClienteHonorarios" name="rutClienteHonorarios" readonly>
+                </div>
+                <div class="form-column">
+                    <label for="nombreClienteHonorarios">Nombre de Cliente:</label>
+                    <input type="text" id="nombreClienteHonorarios" name="nombreClienteHonorarios" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="rolHonorarios">ROL / Año:</label>
+                    <input type="text" id="rolHonorarios" name="rolHonorarios" readonly>
+                </div>
+            </div>
+            <!-- Fila 2: Tipo Documento, N.º de Documento -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="tipoDocumento">Tipo Documento:</label>
+                    <select id="tipoDocumento" name="tipoDocumento" required>
+                        <option value="">Seleccione un tipo de documento</option>
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+                <div class="form-column">
+                    <label for="numeroDocumento">N.º de Documento:</label>
+                    <input type="text" id="numeroDocumento" name="numeroDocumento" required>
+                </div>
+            </div>
+            <!-- Fila 3: Fecha Documento y Monto -->
+            <div class="form-row">
+                <div class="form-column">
+                    <label for="fechaDocumento">Fecha Documento:</label>
+                    <input type="date" id="fechaDocumento" name="fechaDocumento" required>
+                </div>
+                <div class="form-column">
+                    <label for="montoHonorarios">Monto:</label>
+                    <input type="text" id="montoHonorarios" name="montoHonorarios" required>
+                </div>
+            </div>
+            <!-- Botón Guardar -->
+            <div class="form-row form-actions">
+                <button type="submit">Guardar Honorarios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+

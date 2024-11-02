@@ -3,38 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Judicial - Iniciar Sesión / Registro</title>
+    <title>Gestión Judicial - Iniciar Sesión</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <div class="container">
-    <div class="tabs">
-        <button id="login-tab" class="tab active">Iniciar Sesión</button>
-        <button id="register-tab" class="tab">Registrarse</button>
-    </div>
-
+    <h2>Iniciar Sesión</h2>
     <div id="auth-message" class="auth-message"></div>
 
     <!-- Formulario de Inicio de Sesión -->
     <form id="login-form" class="form active">
-        <h2>Iniciar Sesión</h2>
         <input type="email" id="login-email" placeholder="Correo electrónico" required>
         <input type="password" id="login-password" placeholder="Contraseña" required>
         <button type="submit">Iniciar Sesión</button>
         <p><a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a></p>
     </form>
 
-    <!-- Formulario de Registro -->
-    <form id="register-form" class="form">
-        <h2>Registrarse</h2>
-        <input type="email" id="register-email" placeholder="Correo electrónico" required>
-        <input type="password" id="register-password" placeholder="Contraseña" required>
-        <button type="submit">Registrarse</button>
-    </form>
+    <!-- Sección de Autenticación de Dos Factores -->
+    <div id="two-factor">
+        <button type="button">Habilitar 2FA</button>
+        <p>La autenticación de dos factores agrega una capa adicional de seguridad a su cuenta, garantizando que solo usted tenga derechos para iniciar sesión.</p>
+    </div>
 </div>
 
 <!-- Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
+
+
