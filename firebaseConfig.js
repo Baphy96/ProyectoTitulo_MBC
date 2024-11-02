@@ -1,5 +1,8 @@
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Importar módulos de Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+// Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDp640IDbTZKs06pb6HbTV8MUbK2PxH94I",
     authDomain: "gestion-judicial-db4b3.firebaseapp.com",
@@ -8,8 +11,10 @@ const firebaseConfig = {
     messagingSenderId: "303875022601",
     appId: "1:303875022601:web:2e6b5d64875f76c629bdd8",
     measurementId: "G-37809R39P3"
-  };
-  
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+};
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+export { auth };
