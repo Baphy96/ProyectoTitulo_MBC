@@ -1,6 +1,3 @@
-
-
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { app, auth, db } from "../firebaseConfig.js";
@@ -31,9 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchStateInput = document.getElementById('stateSearch');
     const searchEntityInput = document.getElementById('entitySearch');
 
+
     // Manejar clic en las pestañas
     tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
         // Remover la clase "active" de todas las pestañas y contenidos
         tabButtons.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
@@ -51,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (tabId === 'estados') {
             loadStates();
         } else if (tabId === 'entidades') {
-            // Agregar la lógica de carga de entidades aquí si es necesario
+            
         }
     });
     });
@@ -61,6 +59,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (activeButton) {
         const tabId = activeButton.getAttribute('data-tab');
         document.getElementById(tabId).classList.add('active');
+        // Cargar los datos de entidades si la pestaña activa es 'entidades'
+        if (tabId === 'entidades') {
+            loadEntities();
+        }
     }
 
     // Mostrar el modal para agregar o editar un registro
@@ -135,7 +137,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
         showModal("Agregar Nueva Entidad", formContent, async function (event) {
             event.preventDefault();
-            
+    
+            if (!validateForm()) {
+                return;
+            }
+    
             const specialties = [];
             document.querySelectorAll('input[name="specialty"]:checked').forEach(checkbox => {
                 specialties.push(checkbox.value);
@@ -159,7 +165,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("Entidad agregada con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadEntities(); // Recargar la lista de entidades después de agregar una nueva
+                $('#entityTable').DataTable().clear().destroy();
+                loadEntities();
             } catch (e) {
                 console.error("Error al agregar la entidad: ", e);
             }
@@ -174,16 +181,69 @@ document.addEventListener('DOMContentLoaded', function () {
                 specialtiesSection.style.display = 'none';
             }
         });   
-        
     });
-
+    
+    // Función para validar el formulario
+    function validateForm() {
+        // Validaciones de los campos
+        let isValid = true;
+        const rut = document.getElementById('entityRut').value;
+        if (!/^[0-9]{7,8}-[0-9kK]$/.test(rut) || !validateRut(rut)) {
+            alert('RUT inválido. Por favor ingrese un RUT válido sin puntos pero con guion (ej: 12345678-9).');
+            isValid = false;
+        }
+    
+        const nombre = document.getElementById('entityName').value;
+        if (nombre.trim().length < 3) {
+            alert('El nombre es requerido y debe tener al menos 3 caracteres.');
+            isValid = false;
+        }
+    
+        const direccion = document.getElementById('entityAddress').value;
+        if (direccion.trim().length < 5) {
+            alert('La dirección es requerida y debe tener al menos 5 caracteres.');
+            isValid = false;
+        }
+    
+        const telefono = document.getElementById('entityPhone').value;
+        if (!/^[0-9]{9}$/.test(telefono)) {
+            alert('El teléfono debe tener 9 dígitos.');
+            isValid = false;
+        }
+    
+        const correo = document.getElementById('entityEmail').value;
+        if (!/\S+@\S+\.\S+/.test(correo)) {
+            alert('Correo inválido. Por favor ingrese un correo válido.');
+            isValid = false;
+        }
+    
+        return isValid;
+    }
+    
+    // Función para validar el RUT con dígito verificador
+    function validateRut(rut) {
+        if (!/^[0-9]+-[0-9kK]$/.test(rut)) {
+            return false;
+        }
+        const [num, dv] = rut.split('-');
+        let suma = 0;
+        let multiplicador = 2;
+        for (let i = num.length - 1; i >= 0; i--) {
+            suma += parseInt(num[i]) * multiplicador;
+            multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+        }
+        const dvEsperado = 11 - (suma % 11);
+        const dvFinal = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+        return dvFinal.toLowerCase() === dv.toLowerCase();
+    }
     
     // Cargar entidades desde Firestore
     async function loadEntities() {
         try {
             const querySnapshot = await getDocs(collection(db, "Entidades"));
-            entityTableBody.innerHTML = ""; // Limpiar tabla
+            entityTableBody.innerHTML = "";
     
+            // Crear o actualizar la tabla
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const row = document.createElement('tr');
@@ -205,102 +265,129 @@ document.addEventListener('DOMContentLoaded', function () {
                 row.querySelector('.edit-button').addEventListener('click', () => editEntity(doc.id, data));
                 row.querySelector('.delete-button').addEventListener('click', () => deleteEntity(doc.id));
             });
+    
+            // Verificar si DataTable está inicializado
+            if (!$.fn.DataTable.isDataTable('#entityTable')) {
+                $('#entityTable').DataTable({
+                    language: {
+                        emptyTable: "No hay datos disponibles en la tabla",
+                        lengthMenu: "Mostrar _MENU_ entradas",
+                        search: "Buscar:",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
+                    }
+                });
+            } else {
+                // Si ya está inicializado, solo redibujar la tabla
+                $('#entityTable').DataTable().draw();
+            }
         } catch (e) {
             console.error("Error al cargar entidades: ", e);
         }
     }
     
+    
     // Editar entidad
-    function editEntity(id, data) {
-        const formContent = `
-            <div class="form-row">
-                <label for="entityRut">RUT:</label>
-                <input type="text" id="entityRut" name="entityRut" value="${data.Rut}" required>
+function editEntity(id, data) {
+    const formContent = `
+        <div class="form-row">
+            <label for="entityRut">RUT:</label>
+            <input type="text" id="entityRut" name="entityRut" value="${data.Rut}" required>
+        </div>
+        <div class="form-row">
+            <label for="entityName">Nombre:</label>
+            <input type="text" id="entityName" name="entityName" value="${data.Nombre}" required>
+        </div>
+        <div class="form-row">
+            <label for="entityAddress">Dirección:</label>
+            <input type="text" id="entityAddress" name="entityAddress" value="${data.Direccion}" required>
+        </div>
+        <div class="form-row">
+            <label for="entityPhone">Teléfono:</label>
+            <input type="text" id="entityPhone" name="entityPhone" value="${data.Telefono}" required>
+        </div>
+        <div class="form-row">
+            <label for="entityEmail">Correo:</label>
+            <input type="email" id="entityEmail" name="entityEmail" value="${data.Correo}" required>
+        </div>
+        <div class="form-row">
+            <label for="entityType">Tipo de Entidad:</label>
+            <select id="entityType" name="entityType" required>
+                <option value="Cliente" ${data.TipoEntidad === "Cliente" ? "selected" : ""}>Cliente</option>
+                <option value="Abogado" ${data.TipoEntidad === "Abogado" ? "selected" : ""}>Abogado</option>
+                <option value="Receptor Judicial" ${data.TipoEntidad === "Receptor Judicial" ? "selected" : ""}>Receptor Judicial</option>
+                <option value="Abogado Coordinador" ${data.TipoEntidad === "Abogado Coordinador" ? "selected" : ""}>Abogado Coordinador</option>
+            </select>
+        </div>
+        <div id="specialtiesSection" class="form-row" style="display:${data.TipoEntidad === "Abogado" ? "block" : "none"};">
+            <label>Especialidad:</label>
+            <div>
+                <label><input type="checkbox" name="specialty" value="Civil" ${data.Especialidades?.includes("Civil") ? "checked" : ""}> Civil</label>
+                <label><input type="checkbox" name="specialty" value="Penal" ${data.Especialidades?.includes("Penal") ? "checked" : ""}> Penal</label>
+                <label><input type="checkbox" name="specialty" value="Laboral" ${data.Especialidades?.includes("Laboral") ? "checked" : ""}> Laboral</label>
+                <label><input type="checkbox" name="specialty" value="Tributario" ${data.Especialidades?.includes("Tributario") ? "checked" : ""}> Tributario</label>
+                <label><input type="checkbox" name="specialty" value="Familia" ${data.Especialidades?.includes("Familia") ? "checked" : ""}> Familia</label>
+                <label><input type="checkbox" name="specialty" value="Comercial" ${data.Especialidades?.includes("Comercial") ? "checked" : ""}> Comercial</label>
+                <label><input type="checkbox" name="specialty" value="Ambiental" ${data.Especialidades?.includes("Ambiental") ? "checked" : ""}> Ambiental</label>
             </div>
-            <div class="form-row">
-                <label for="entityName">Nombre:</label>
-                <input type="text" id="entityName" name="entityName" value="${data.Nombre}" required>
-            </div>
-            <div class="form-row">
-                <label for="entityAddress">Dirección:</label>
-                <input type="text" id="entityAddress" name="entityAddress" value="${data.Direccion}" required>
-            </div>
-            <div class="form-row">
-                <label for="entityPhone">Teléfono:</label>
-                <input type="text" id="entityPhone" name="entityPhone" value="${data.Telefono}" required>
-            </div>
-            <div class="form-row">
-                <label for="entityEmail">Correo:</label>
-                <input type="email" id="entityEmail" name="entityEmail" value="${data.Correo}" required>
-            </div>
-            <div class="form-row">
-                <label for="entityType">Tipo de Entidad:</label>
-                <select id="entityType" name="entityType" required>
-                    <option value="Cliente" ${data.TipoEntidad === "Cliente" ? "selected" : ""}>Cliente</option>
-                    <option value="Abogado" ${data.TipoEntidad === "Abogado" ? "selected" : ""}>Abogado</option>
-                    <option value="Receptor Judicial" ${data.TipoEntidad === "Receptor Judicial" ? "selected" : ""}>Receptor Judicial</option>
-                    <option value="Abogado Coordinador" ${data.TipoEntidad === "Abogado Coordinador" ? "selected" : ""}>Abogado Coordinador</option>
-                </select>
-            </div>
-            <div id="specialtiesSection" class="form-row" style="display:${data.TipoEntidad === "Abogado" ? "block" : "none"};">
-                <label>Especialidad:</label>
-                <div>
-                    <label><input type="checkbox" name="specialty" value="Civil" ${data.Especialidades?.includes("Civil") ? "checked" : ""}> Civil</label>
-                    <label><input type="checkbox" name="specialty" value="Penal" ${data.Especialidades?.includes("Penal") ? "checked" : ""}> Penal</label>
-                    <label><input type="checkbox" name="specialty" value="Laboral" ${data.Especialidades?.includes("Laboral") ? "checked" : ""}> Laboral</label>
-                    <label><input type="checkbox" name="specialty" value="Tributario" ${data.Especialidades?.includes("Tributario") ? "checked" : ""}> Tributario</label>
-                    <label><input type="checkbox" name="specialty" value="Familia" ${data.Especialidades?.includes("Familia") ? "checked" : ""}> Familia</label>
-                    <label><input type="checkbox" name="specialty" value="Comercial" ${data.Especialidades?.includes("Comercial") ? "checked" : ""}> Comercial</label>
-                    <label><input type="checkbox" name="specialty" value="Ambiental" ${data.Especialidades?.includes("Ambiental") ? "checked" : ""}> Ambiental</label>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="save-button">Guardar</button>
-            </div>
-        `;
-    
-        showModal("Editar Entidad", formContent, async function (event) {
-            event.preventDefault();
-            
-            const specialties = [];
-            document.querySelectorAll('input[name="specialty"]:checked').forEach(checkbox => {
-                specialties.push(checkbox.value);
-            });
-    
-            const updatedEntity = {
-                Rut: document.getElementById('entityRut').value,
-                Nombre: document.getElementById('entityName').value,
-                Direccion: document.getElementById('entityAddress').value,
-                Telefono: document.getElementById('entityPhone').value,
-                Correo: document.getElementById('entityEmail').value,
-                TipoEntidad: document.getElementById('entityType').value,
-            };
-    
-            if (updatedEntity.TipoEntidad === "Abogado") {
-                updatedEntity.Especialidades = specialties;
-            }
-    
-            try {
-                await updateDoc(doc(db, "Entidades", id), updatedEntity);
-                console.log("Entidad actualizada con éxito.");
-                maintainerModal.style.display = 'none';
-                maintainerForm.reset();
-                loadEntities(); // Recargar la lista de entidades después de la actualización
-            } catch (e) {
-                console.error("Error al actualizar la entidad: ", e);
-            }
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="save-button">Guardar</button>
+        </div>
+    `;
+
+    showModal("Editar Entidad", formContent, async function (event) {
+        event.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        const specialties = [];
+        document.querySelectorAll('input[name="specialty"]:checked').forEach(checkbox => {
+            specialties.push(checkbox.value);
         });
-    
-        // Mostrar/ocultar especialidades dependiendo del tipo de entidad seleccionado
-        document.getElementById('entityType').addEventListener('change', function () {
-            const specialtiesSection = document.getElementById('specialtiesSection');
-            if (this.value === 'Abogado') {
-                specialtiesSection.style.display = 'block';
-            } else {
-                specialtiesSection.style.display = 'none';
-            }
-        });
-    }
+
+        const updatedEntity = {
+            Rut: document.getElementById('entityRut').value,
+            Nombre: document.getElementById('entityName').value,
+            Direccion: document.getElementById('entityAddress').value,
+            Telefono: document.getElementById('entityPhone').value,
+            Correo: document.getElementById('entityEmail').value,
+            TipoEntidad: document.getElementById('entityType').value,
+        };
+
+        if (updatedEntity.TipoEntidad === "Abogado") {
+            updatedEntity.Especialidades = specialties;
+        }
+
+        try {
+            await updateDoc(doc(db, "Entidades", id), updatedEntity);
+            console.log("Entidad actualizada con éxito.");
+            maintainerModal.style.display = 'none';
+            maintainerForm.reset();
+            $('#entityTable').DataTable().clear().destroy();
+            loadEntities();
+        } catch (e) {
+            console.error("Error al actualizar la entidad: ", e);
+        }
+    });
+
+    // Mostrar/ocultar especialidades dependiendo del tipo de entidad seleccionado
+    document.getElementById('entityType').addEventListener('change', function () {
+        const specialtiesSection = document.getElementById('specialtiesSection');
+        if (this.value === 'Abogado') {
+            specialtiesSection.style.display = 'block';
+        } else {
+            specialtiesSection.style.display = 'none';
+        }
+    });
+}
     
     // Eliminar entidad
     async function deleteEntity(id) {
@@ -308,12 +395,14 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 await deleteDoc(doc(db, "Entidades", id));
                 console.log("Entidad eliminada con éxito.");
-                loadEntities(); // Recargar la lista de entidades después de la eliminación
+                $('#entityTable').DataTable().clear().destroy();
+                loadEntities();
             } catch (e) {
                 console.error("Error al eliminar la entidad: ", e);
             }
         }
     }
+
     
     // Manejar la búsqueda de entidades
     searchEntityInput?.addEventListener('input', function () {
@@ -321,14 +410,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const rows = entityTableBody.getElementsByTagName('tr');
         Array.from(rows).forEach(row => {
             const rut = row.cells[0].innerText.toLowerCase();
-            const nombre = row.cells[1].innerText.toLowerCase();
-            if (rut.includes(searchValue) || nombre.includes(searchValue)) {
+            const nombre = row.cells[1].innerText.toLowerCase();            
+            const tipoEntidad = row.cells[5].innerText.toLowerCase();
+            if (rut.includes(searchValue) || nombre.includes(searchValue) || tipoEntidad.includes(searchValue)) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
         });
     });
+
 
     /* ====================
        Funciones para Tipos de Servicio
@@ -360,24 +451,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("Tipo de servicio agregado con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadServiceTypes(); // Recargar la lista de tipos de servicio después de agregar uno nuevo
+                $('#serviceTypeTable').DataTable().clear().destroy();
+                loadServiceTypes();
             } catch (e) {
                 console.error("Error al agregar el tipo de servicio: ", e);
             }
         });
-
-        // Botón cancelar
-        document.getElementById('cancelModalButton').addEventListener('click', () => {
-            maintainerModal.style.display = 'none';
-        });
-    });
+    });       
 
     // Cargar tipos de servicio desde Firestore
     async function loadServiceTypes() {
         try {
             const querySnapshot = await getDocs(collection(db, "TipoServicio"));
-            serviceTypeTableBody.innerHTML = ""; // Limpiar tabla
-
+            serviceTypeTableBody.innerHTML = "";
+    
+            // Crear o actualizar la tabla
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const row = document.createElement('tr');
@@ -390,13 +478,33 @@ document.addEventListener('DOMContentLoaded', function () {
                     </td>
                 `;
                 serviceTypeTableBody.appendChild(row);
-
-                // Añadir eventos a los botones de editar y eliminar
+    
                 row.querySelector('.edit-button').addEventListener('click', () => editServiceType(doc.id, data));
                 row.querySelector('.delete-button').addEventListener('click', () => deleteServiceType(doc.id));
             });
+    
+            // Verificar si DataTable está inicializado
+            if (!$.fn.DataTable.isDataTable('#serviceTypeTable')) {
+                $('#serviceTypeTable').DataTable({
+                    language: {
+                        emptyTable: "No hay datos disponibles en la tabla",
+                        lengthMenu: "Mostrar _MENU_ entradas",
+                        search: "Buscar:",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
+                    }
+                });
+            } else {
+                // Si ya está inicializado, solo redibujar la tabla
+                $('#serviceTypeTable').DataTable().draw();
+            }
         } catch (e) {
-            console.error("Error al cargar tipos de servicio: ", e);
+            console.error("Error al cargar los tipos de servicio: ", e);
         }
     }
 
@@ -428,7 +536,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("Tipo de servicio actualizado con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadServiceTypes(); // Recargar la lista de tipos de servicio después de la actualización
+                $('#serviceTypeTable').DataTable().clear().destroy();
+                loadServiceTypes();
             } catch (e) {
                 console.error("Error al actualizar el tipo de servicio: ", e);
             }
@@ -441,7 +550,8 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 await deleteDoc(doc(db, "TipoServicio", id));
                 console.log("Tipo de servicio eliminado con éxito.");
-                loadServiceTypes(); // Recargar la lista de tipos de servicio después de la eliminación
+                $('#serviceTypeTable').DataTable().clear().destroy();
+                loadServiceTypes();
             } catch (e) {
                 console.error("Error al eliminar el tipo de servicio: ", e);
             }
@@ -462,6 +572,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    
 
     /* ====================
        Funciones para Tribunales
@@ -488,13 +599,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 Codigo: document.getElementById('courtCode').value,
                 Descripcion: document.getElementById('courtName').value,
             };
-
+    
             try {
                 await addDoc(collection(db, "Tribunales"), nuevoTribunal);
                 console.log("Tribunal agregado con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadCourts(); // Recargar la lista de tribunales después de agregar uno nuevo
+                $('#courtTable').DataTable().clear().destroy();
+                loadCourts();
             } catch (e) {
                 console.error("Error al agregar el tribunal: ", e);
             }
@@ -505,8 +617,9 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadCourts() {
         try {
             const querySnapshot = await getDocs(collection(db, "Tribunales"));
-            courtTableBody.innerHTML = ""; // Limpiar tabla
-
+            courtTableBody.innerHTML = "";
+    
+            // Crear o actualizar la tabla
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const row = document.createElement('tr');
@@ -515,15 +628,35 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${data.Descripcion}</td>
                     <td>
                         <button class="edit-button" data-id="${doc.id}">✏️</button>
-                        <button class="delete-button" data-id="${doc.id}">🗑️</button>                        
+                        <button class="delete-button" data-id="${doc.id}">🗑️</button>
                     </td>
                 `;
                 courtTableBody.appendChild(row);
-
-                // Añadir eventos a los botones de editar y eliminar
+    
                 row.querySelector('.edit-button').addEventListener('click', () => editCourt(doc.id, data));
                 row.querySelector('.delete-button').addEventListener('click', () => deleteCourt(doc.id));
             });
+    
+            // Verificar si DataTable está inicializado
+            if (!$.fn.DataTable.isDataTable('#courtTable')) {
+                $('#courtTable').DataTable({
+                    language: {
+                        emptyTable: "No hay datos disponibles en la tabla",
+                        lengthMenu: "Mostrar _MENU_ entradas",
+                        search: "Buscar:",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
+                    }
+                });
+            } else {
+                // Si ya está inicializado, solo redibujar la tabla
+                $('#courtTable').DataTable().draw();
+            }
         } catch (e) {
             console.error("Error al cargar los tribunales: ", e);
         }
@@ -551,18 +684,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 Codigo: document.getElementById('courtCode').value,
                 Descripcion: document.getElementById('courtName').value,
             };
-
+    
             try {
                 await updateDoc(doc(db, "Tribunales", id), updatedCourt);
                 console.log("Tribunal actualizado con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadCourts(); // Recargar la lista de tribunales después de la actualización
+                $('#courtTable').DataTable().clear().destroy();
+                loadCourts();
             } catch (e) {
                 console.error("Error al actualizar el tribunal: ", e);
             }
         });
-    
     }
 
     // Eliminar tribunal
@@ -571,7 +704,8 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 await deleteDoc(doc(db, "Tribunales", id));
                 console.log("Tribunal eliminado con éxito.");
-                loadCourts(); // Recargar la lista de tribunales después de la eliminación
+                $('#courtTable').DataTable().clear().destroy();
+                loadCourts();
             } catch (e) {
                 console.error("Error al eliminar el tribunal: ", e);
             }
@@ -580,18 +714,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Manejar la búsqueda de tribunales
     searchStateInput?.addEventListener('input', function () {
-        const searchValue = searchStateInput.value.toLowerCase();
-        const rows = stateTableBody.getElementsByTagName('tr');
-        Array.from(rows).forEach(row => {
-            const codigo = row.cells[0].innerText.toLowerCase();
-            const descripcion = row.cells[1].innerText.toLowerCase();
-            if (codigo.includes(searchValue) || descripcion.includes(searchValue)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
+    const searchValue = searchStateInput.value.toLowerCase();
+    const rows = stateTableBody.getElementsByTagName('tr');
+    Array.from(rows).forEach(row => {
+        const codigo = row.cells[0].innerText.toLowerCase();
+        const descripcion = row.cells[1].innerText.toLowerCase();
+        if (codigo.includes(searchValue) || descripcion.includes(searchValue)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
+});
 
      /* ====================
        Funciones para Estados
@@ -615,16 +749,17 @@ document.addEventListener('DOMContentLoaded', function () {
         showModal("Agregar Nuevo Estado", formContent, async function (event) {
             event.preventDefault();
             const nuevoEstado = {
-                codigo: document.getElementById('stateCode').value,
-                descripcion: document.getElementById('stateName').value,
+                Codigo: document.getElementById('stateCode').value,
+                Descripcion: document.getElementById('stateName').value,
             };
-
+    
             try {
-                await addDoc(collection(db, "estados"), nuevoEstado);
+                await addDoc(collection(db, "EstadoJudicial"), nuevoEstado);
                 console.log("Estado agregado con éxito.");
                 maintainerModal.style.display = 'none';
                 maintainerForm.reset();
-                loadStates(); // Recargar la lista de estados después de agregar uno nuevo
+                $('#stateTable').DataTable().clear().destroy();
+                loadStates();
             } catch (e) {
                 console.error("Error al agregar el estado: ", e);
             }
@@ -635,8 +770,9 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadStates() {
         try {
             const querySnapshot = await getDocs(collection(db, "EstadoJudicial"));
-            stateTableBody.innerHTML = ""; // Limpiar tabla
+            stateTableBody.innerHTML = "";
     
+            // Crear o actualizar la tabla
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const row = document.createElement('tr');
@@ -650,48 +786,70 @@ document.addEventListener('DOMContentLoaded', function () {
                 `;
                 stateTableBody.appendChild(row);
     
-                // Añadir eventos a los botones de editar y eliminar
                 row.querySelector('.edit-button').addEventListener('click', () => editState(doc.id, data));
                 row.querySelector('.delete-button').addEventListener('click', () => deleteState(doc.id));
             });
+    
+            // Verificar si DataTable está inicializado
+            if (!$.fn.DataTable.isDataTable('#stateTable')) {
+                $('#stateTable').DataTable({
+                    language: {
+                        emptyTable: "No hay datos disponibles en la tabla",
+                        lengthMenu: "Mostrar _MENU_ entradas",
+                        search: "Buscar:",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
+                    }
+                });
+            } else {
+                // Si ya está inicializado, solo redibujar la tabla
+                $('#stateTable').DataTable().draw();
+            }
         } catch (e) {
             console.error("Error al cargar los estados: ", e);
         }
     }
+
     //Editar estado
     function editState(id, data) {
-        const formContent = `
-            <div class="form-row">
-                <label for="stateCode">Código:</label>
-                <input type="text" id="stateCode" name="stateCode" value="${data.Codigo}" required>
-            </div>
-            <div class="form-row">
-                <label for="stateName">Descripción del Estado:</label>
-                <input type="text" id="stateName" name="stateName" value="${data.Descripcion}" required>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="save-button">Guardar</button>
-                           </div>
-        `;
+    const formContent = `
+        <div class="form-row">
+            <label for="stateCode">Código:</label>
+            <input type="text" id="stateCode" name="stateCode" value="${data.Codigo}" required>
+        </div>
+        <div class="form-row">
+            <label for="stateName">Descripción del Estado:</label>
+            <input type="text" id="stateName" name="stateName" value="${data.Descripcion}" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="save-button">Guardar</button>
+        </div>
+    `;
 
-        showModal("Editar Estado", formContent, async function (event) {
-            event.preventDefault();
-            const updatedState = {
-                Codigo: document.getElementById('stateCode').value,
-                Descripcion: document.getElementById('stateName').value,
-            };
+    showModal("Editar Estado", formContent, async function (event) {
+        event.preventDefault();
+        const updatedState = {
+            Codigo: document.getElementById('stateCode').value,
+            Descripcion: document.getElementById('stateName').value,
+        };
 
-            try {
-                await updateDoc(doc(db, "EstadoJudicial", id), updatedState);
-                console.log("Estado actualizado con éxito.");
-                maintainerModal.style.display = 'none';
-                maintainerForm.reset();
-                loadStates(); // Recargar la lista de estados después de la actualización
-            } catch (e) {
-                console.error("Error al actualizar el estado: ", e);
-            }
-        });
-    }
+        try {
+            await updateDoc(doc(db, "EstadoJudicial", id), updatedState);
+            console.log("Estado actualizado con éxito.");
+            maintainerModal.style.display = 'none';
+            maintainerForm.reset();
+            $('#stateTable').DataTable().clear().destroy();
+            loadStates();
+        } catch (e) {
+            console.error("Error al actualizar el estado: ", e);
+        }
+    });
+}
     
 
     // Eliminar estado
@@ -700,7 +858,8 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 await deleteDoc(doc(db, "EstadoJudicial", id));
                 console.log("Estado eliminado con éxito.");
-                loadStates(); // Recargar la lista de estados después de la eliminación
+                $('#stateTable').DataTable().clear().destroy();
+                loadStates();
             } catch (e) {
                 console.error("Error al eliminar el estado: ", e);
             }
@@ -721,4 +880,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    
 });
+
+
+
