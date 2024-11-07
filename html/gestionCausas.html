@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Causas</title>
-    <link rel="stylesheet" href="../css/gestionCausas.css">
+    <title>Gestión de Causas</title>    
     <link rel="stylesheet" href="../css/menu.css"> <!-- Estilos de barra lateral -->
     <link rel="stylesheet" href="../css/gestionCausas.css"> <!-- Estilos de la interfaz de gestión de causas -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
 </head>
 <body>
 
@@ -64,7 +67,7 @@
 
         <section class="results-section">
             <button id="addCause">Agregar Nueva Causa</button>
-            <table>
+            <table id="causasTable" class="display">
                 <thead>
                     <tr>
                         <th>Rut Cliente</th>
@@ -83,7 +86,7 @@
         </section>
     </main>
 
-    <script type="module" src="../scripts/gestionCausas.js"></script>
+  
 
 <!-- Modal para agregar nueva causa -->
 <div id="addCauseModal" class="modal">
@@ -100,7 +103,7 @@
                         <option value="">Seleccione un cliente</option>
                         <!-- Opciones dinámicas -->
                     </select>
-                    <button type="button" class="add-button">+</button>
+                    <button type="button" class="add-button">+</button> <!-- Botón para abrir modal de "Agregar Nuevo Cliente" -->
                 </div>
             </div>
         
@@ -167,7 +170,7 @@
                             <option value="">Seleccione un receptor</option>
                             <!-- Opciones dinámicas -->
                         </select>
-                        <button type="button" class="add-button">+</button>
+                        
                     </div>
                 </div>
                 <div class="form-column">
@@ -177,7 +180,7 @@
                             <option value="">Seleccione un abogado coordinador</option>
                             <!-- Opciones dinámicas -->
                         </select>
-                        <button type="button" class="add-button">+</button>
+                        
                     </div>
                 </div>
             </div>
@@ -200,24 +203,57 @@
     </div>
 </div>
 
+<!-- Modal para agregar nueva entidad -->
+<div id="maintainerModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Agregar Nueva Entidad</h2>
+        <form id="maintainerForm">
+            <div class="form-row">
+                <label for="entityRut">RUT:</label>
+                <input type="text" id="entityRut" name="entityRut" required>
+            </div>
+            <div class="form-row">
+                <label for="entityName">Nombre:</label>
+                <input type="text" id="entityName" name="entityName" required>
+            </div>
+            <div class="form-row">
+                <label for="entityAddress">Dirección:</label>
+                <input type="text" id="entityAddress" name="entityAddress" required>
+            </div>
+            <div class="form-row">
+                <label for="entityPhone">Teléfono:</label>
+                <input type="text" id="entityPhone" name="entityPhone" required>
+            </div>
+            <div class="form-row">
+                <label for="entityEmail">Correo:</label>
+                <input type="email" id="entityEmail" name="entityEmail" required>
+            </div>
+            <div class="form-row">
+                <label for="entityType">Tipo de Entidad:</label>
+                <select id="entityType" name="entityType" required>
+                    <option value="Cliente">Cliente</option>                    
+                </select>
+            </div>            
+            <div class="form-actions">
+                <button type="submit" class="save-button">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Modal para agregar honorarios -->
 <div id="honorariosModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Agregar Honorarios</h2>
         <form id="honorariosForm">
-            <!-- Fila 1: RUT Cliente, Nombre Cliente, ROL / Año -->
+            <!-- Fila 1: Nombre Cliente, ROL / Año -->
             <div class="form-row">
-                <div class="form-column">
-                    <label for="rutClienteHonorarios">Rut de Cliente:</label>
-                    <input type="text" id="rutClienteHonorarios" name="rutClienteHonorarios" readonly>
-                </div>
                 <div class="form-column">
                     <label for="nombreClienteHonorarios">Nombre de Cliente:</label>
                     <input type="text" id="nombreClienteHonorarios" name="nombreClienteHonorarios" readonly>
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="form-column">
                     <label for="rolHonorarios">ROL / Año:</label>
                     <input type="text" id="rolHonorarios" name="rolHonorarios" readonly>
@@ -229,7 +265,12 @@
                     <label for="tipoDocumento">Tipo Documento:</label>
                     <select id="tipoDocumento" name="tipoDocumento" required>
                         <option value="">Seleccione un tipo de documento</option>
-                        <!-- Opciones dinámicas -->
+                        <option value="Factura Electrónica">Factura Electrónica</option>
+                        <option value="Factura No Afecta o Exenta Electrónica">Factura No Afecta o Exenta Electrónica</option>
+                        <option value="Nota de Crédito Electrónica">Nota de Crédito Electrónica</option>
+                        <option value="Nota de Débito Electrónica">Nota de Débito Electrónica</option>
+                        <option value="Boleta Electrónica">Boleta Electrónica</option>
+                        <option value="Boleta de Honorarios Electrónica">Boleta de Honorarios Electrónica</option>
                     </select>
                 </div>
                 <div class="form-column">
@@ -255,6 +296,10 @@
         </form>
     </div>
 </div>
+
+<script type="module" src="../scripts/gestionCausas.js"></script>
+
+
 
 </body>
 </html>

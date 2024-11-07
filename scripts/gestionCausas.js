@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Abrir el modal al hacer clic en "Agregar Nueva Causa"
     addCauseButton.addEventListener('click', function () {
-        console.log('Botón "Agregar Nueva Causa" clicado');
+  
         addCauseModal.style.display = 'block';
         loadDropdownOptions(); // Cargar opciones al abrir el modal
     });
@@ -40,77 +40,161 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Abrir el modal de honorarios al hacer clic en el botón "Honorarios"
-    honorariosButton.addEventListener('click', function () {
-        // Autocompletar los campos del modal de honorarios con la información ingresada en el formulario de "Agregar Nueva Causa"
-        document.getElementById('rutClienteHonorarios').value = document.getElementById('cliente').value;
-        document.getElementById('nombreClienteHonorarios').value = document.getElementById('cliente').selectedOptions[0].text;
-        document.getElementById('rolHonorarios').value = document.getElementById('rol').value;
+            /* ====================
+       MODAL BOTON AGREGAR CLIENTE
+       ==================== */
 
-        honorariosModal.style.display = 'block';
-    });
+    /// Manejar clic en botones para agregar cliente desde "Agregar Nueva Causa"
+    const formContent = `
+        <div class="form-row">
+            <label for="entityRut">RUT:</label>
+            <input type="text" id="entityRut" name="entityRut" required>
+        </div>
+        <div class="form-row">
+            <label for="entityName">Nombre:</label>
+            <input type="text" id="entityName" name="entityName" required>
+        </div>
+        <div class="form-row">
+            <label for="entityAddress">Dirección:</label>
+            <input type="text" id="entityAddress" name="entityAddress" required>
+        </div>
+        <div class="form-row">
+            <label for="entityPhone">Teléfono:</label>
+            <input type="text" id="entityPhone" name="entityPhone" required>
+        </div>
+        <div class="form-row">
+            <label for="entityEmail">Correo:</label>
+            <input type="email" id="entityEmail" name="entityEmail" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="save-button">Guardar</button>
+        </div>
+    `;
 
-    /// Manejar clic en botones para agregar entidad desde "Agregar Nueva Causa"
+    // Manejar clic en botones para agregar Cliente desde "Agregar Nueva Causa"
     document.querySelectorAll('.add-button').forEach(button => {
         button.addEventListener('click', () => {
-            const formContent = `
-                <div class="form-row">
-                    <label for="entityRut">RUT:</label>
-                    <input type="text" id="entityRut" name="entityRut" required>
-                </div>
-                <div class="form-row">
-                    <label for="entityName">Nombre:</label>
-                    <input type="text" id="entityName" name="entityName" required>
-                </div>
-                <div class="form-row">
-                    <label for="entityAddress">Dirección:</label>
-                    <input type="text" id="entityAddress" name="entityAddress" required>
-                </div>
-                <div class="form-row">
-                    <label for="entityPhone">Teléfono:</label>
-                    <input type="text" id="entityPhone" name="entityPhone" required>
-                </div>
-                <div class="form-row">
-                    <label for="entityEmail">Correo:</label>
-                    <input type="email" id="entityEmail" name="entityEmail" required>
-                </div>
-                <div class="form-row">
-                    <label for="entityType">Tipo de Entidad:</label>
-                    <select id="entityType" name="entityType" required>
-                        <option value="Cliente">Cliente</option>
-                        <option value="Abogado">Abogado</option>
-                        <option value="Receptor Judicial">Receptor Judicial</option>
-                        <option value="Abogado Coordinador">Abogado Coordinador</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="save-button">Guardar</button>              
-                </div>
-            `;
+          //  console.log('Botón "Agregar Cliente" clicado'); // Debug: Verificar clic
 
-            showModal("Agregar Nueva Entidad", formContent, async function (event) {
+            // Mostrar el modal utilizando la función `showModal`
+            showModal("Agregar Nuevo Cliente", formContent, async function (event) {
                 event.preventDefault();
 
+                if (!validateForm()) {
+                    return;
+                }
+
+                // Crear el objeto nuevo cliente
                 const nuevaEntidad = {
                     Rut: document.getElementById('entityRut').value,
                     Nombre: document.getElementById('entityName').value,
                     Direccion: document.getElementById('entityAddress').value,
                     Telefono: document.getElementById('entityPhone').value,
                     Correo: document.getElementById('entityEmail').value,
-                    TipoEntidad: document.getElementById('entityType').value,
+                    TipoEntidad: "Cliente"  
                 };
 
                 try {
+                    // Agregar la entidad al Firestore
                     await addDoc(collection(db, "Entidades"), nuevaEntidad);
-                    console.log("Entidad agregada con éxito.");
-                    maintainerModal.style.display = 'none';
-                    maintainerForm.reset();
+                   // console.log("Entidad agregada con éxito.");
+
+                    // Cerrar el modal y resetear el formulario
+                    document.getElementById('maintainerModal').style.display = 'none';
+                    document.getElementById('maintainerForm').reset();
+
+                    // Añadir el nuevo cliente como primera opción en la lista desplegable de clientes en "Agregar Nueva Causa"
+                    const clienteSelect = document.getElementById('cliente');
+                    if (clienteSelect) {
+                        const option = document.createElement('option');
+                        option.value = nuevaEntidad.Rut;
+                        option.text = nuevaEntidad.Nombre;
+
+                        // Insertar la nueva opción como la primera en la lista
+                        clienteSelect.insertBefore(option, clienteSelect.firstChild);
+
+                        // Establecer la nueva opción como seleccionada
+                        clienteSelect.selectedIndex = 0;
+
+                       // console.log('Cliente agregado a la lista desplegable y seleccionado como la primera opción.');
+                    }
+                    // Volver a mostrar el modal de "Agregar Nueva Causa"
+                    document.getElementById('addCauseModal').style.display = 'block';
                 } catch (e) {
-                    console.error("Error al agregar la entidad: ", e);
+                    console.error("Error al agregar el cliente: ", e);
                 }
             });
         });
     });
+
+    // Manejar clic en el botón de cierre ("X") del modal "Agregar Nuevo Cliente"
+    document.querySelectorAll('#maintainerModal.close').forEach(button => {
+        button.addEventListener('click', () => {
+            const maintainerModal = document.getElementById('maintainerModal');
+            if (maintainerModal && maintainerModal.style.display === 'block') {
+                maintainerModal.style.display = 'none';
+               // console.log("Modal 'Agregar Nuevo Cliente' cerrado con 'X'.");
+
+                // Mostrar nuevamente el modal "Agregar Nueva Causa"
+                document.getElementById('addCauseModal').style.display = 'block';
+            }
+        });
+    });
+
+
+// Función para validar el formulario
+function validateForm() {
+    let isValid = true;
+    const rut = document.getElementById('entityRut').value;
+    if (!/^[0-9]{7,8}-[0-9kK]$/.test(rut) || !validateRut(rut)) {
+        alert('RUT inválido. Por favor ingrese un RUT válido sin puntos pero con guion (ej: 12345678-9).');
+        isValid = false;
+    }
+
+    const nombre = document.getElementById('entityName').value;
+    if (nombre.trim().length < 3) {
+        alert('El nombre es requerido y debe tener al menos 3 caracteres.');
+        isValid = false;
+    }
+
+    const direccion = document.getElementById('entityAddress').value;
+    if (direccion.trim().length < 5) {
+        alert('La dirección es requerida y debe tener al menos 5 caracteres.');
+        isValid = false;
+    }
+
+    const telefono = document.getElementById('entityPhone').value;
+    if (!/^[0-9]{9}$/.test(telefono)) {
+        alert('El teléfono debe tener 9 dígitos.');
+        isValid = false;
+    }
+
+    const correo = document.getElementById('entityEmail').value;
+    if (!/\S+@\S+\.\S+/.test(correo)) {
+        alert('Correo inválido. Por favor ingrese un correo válido.');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+// Función para validar el RUT con dígito verificador
+function validateRut(rut) {
+    if (!/^[0-9]+-[0-9kK]$/.test(rut)) {
+        return false;
+    }
+    const [num, dv] = rut.split('-');
+    let suma = 0;
+    let multiplicador = 2;
+    for (let i = num.length - 1; i >= 0; i--) {
+        suma += parseInt(num[i]) * multiplicador;
+        multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+    }
+    const dvEsperado = 11 - (suma % 11);
+    const dvFinal = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+    return dvFinal.toLowerCase() === dv.toLowerCase();
+}
+
 
     // Cargar opciones de listas desplegables desde Firestore
     async function loadDropdownOptions() {
@@ -165,10 +249,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Manejar el envío del formulario para agregar una nueva causa
     newCauseForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-
+    
         // Capturar los datos del formulario
         const asistentesLegalesSeleccionados = Array.from(document.getElementById('asistentesLegales').selectedOptions).map(option => option.value);
-
+    
         const nuevaCausa = {
             rut: document.getElementById('cliente').value,
             nombre: document.getElementById('cliente').selectedOptions[0].text,
@@ -182,20 +266,23 @@ document.addEventListener('DOMContentLoaded', function () {
             abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
             asistentesLegales: asistentesLegalesSeleccionados,
         };
-
+    
         // Guardar la nueva causa en Firestore
         try {
             await addDoc(collection(db, "causas"), nuevaCausa);
-            console.log("Causa agregada con éxito.");
+           // console.log("Causa agregada con éxito.");
+        
+            // Cargar las causas nuevamente para actualizar la tabla
+            loadCausas();
         } catch (e) {
             console.error("Error al agregar causa: ", e);
         }
-
+    
         // Cerrar el modal y limpiar el formulario
         addCauseModal.style.display = 'none';
         newCauseForm.reset();
     });
-
+    
     // Función para mostrar el modal reutilizado
     function showModal(title, formContent, onSaveCallback) {
         document.getElementById('modalTitle').innerText = title;
@@ -203,4 +290,160 @@ document.addEventListener('DOMContentLoaded', function () {
         maintainerForm.onsubmit = onSaveCallback;
         maintainerModal.style.display = 'block';
     }
+
+    /* ====================
+       MODAL BOTON HONORARIOS 
+       ==================== */
+
+    // Abrir el modal de honorarios al hacer clic en el botón "Honorarios"
+honorariosButton.addEventListener('click', function () {
+    // Autocompletar los campos del modal de honorarios con la información ingresada en el formulario de "Agregar Nueva Causa"
+    document.getElementById('nombreClienteHonorarios').value = document.getElementById('cliente').selectedOptions[0].text;
+    document.getElementById('rolHonorarios').value = document.getElementById('rol').value;
+
+    // Mostrar el modal de honorarios
+    honorariosModal.style.display = 'block';
 });
+
+// Manejar el cambio en el tipo de documento
+document.getElementById('tipoDocumento').addEventListener('change', function () {
+    const tipoDocumento = this.value;
+    const montoHonorarios = document.getElementById('montoHonorarios');
+
+    if (tipoDocumento === "Nota de Crédito Electrónica") {
+        // Cambiar el color del monto a rojo
+        montoHonorarios.style.color = 'red';
+    } else {
+        // Restablecer el estilo del monto si no es "Nota de Crédito Electrónica"
+        montoHonorarios.style.color = 'black';
+    }
+});
+
+// Manejar el cambio en el tipo de documento
+document.getElementById('tipoDocumento').addEventListener('change', function () {
+    const tipoDocumento = this.value;
+    const montoHonorarios = document.getElementById('montoHonorarios');
+
+    if (tipoDocumento === "Nota de Crédito Electrónica") {
+        // Cambiar el color del monto a rojo
+        montoHonorarios.style.color = 'red';
+    } else {
+        // Restablecer el estilo del monto si no es "Nota de Crédito Electrónica"
+        montoHonorarios.style.color = 'black';
+    }
+});
+
+// Formatear el campo de monto para mostrar el signo de pesos
+document.getElementById('montoHonorarios').addEventListener('input', function () {
+    let valor = this.value.replace(/[^0-9]/g, ''); // Remover todos los caracteres que no sean números
+    if (valor !== "") {
+        valor = parseInt(valor, 10).toLocaleString('es-CL'); // Formatear con separadores de miles (Chile)
+    }
+    this.value = `$ ${valor}`; // Agregar el símbolo de pesos al inicio
+});
+
+// Manejar el evento de guardar honorarios
+document.getElementById('honorariosForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Evitar el envío del formulario predeterminado
+
+    const tipoDocumento = document.getElementById('tipoDocumento').value;
+    let montoHonorarios = document.getElementById('montoHonorarios').value;
+
+    // Quitar el signo de pesos y los separadores de miles para obtener el valor numérico
+    montoHonorarios = montoHonorarios.replace(/[^0-9]/g, ''); // Remover cualquier carácter no numérico
+
+    // Convertir el monto a negativo si es "Nota de Crédito Electrónica"
+    if (tipoDocumento === "Nota de Crédito Electrónica") {
+        montoHonorarios = -Math.abs(parseFloat(montoHonorarios));
+    } else {
+        montoHonorarios = parseFloat(montoHonorarios);
+    }
+
+    // Aquí puedes guardar los datos en tu base de datos
+   // console.log("Tipo de Documento:", tipoDocumento);
+   // console.log("Monto Honorarios:", montoHonorarios);
+
+    // Restablecer el formulario después de guardar
+    this.reset();
+});
+
+
+
+
+
+
+
+
+
+
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    loadCausas(); // Llamar la función una vez que el DOM esté completamente cargado
+});
+
+window.loadCausas = loadCausas;
+
+
+// Función para cargar y mostrar las causas en la tabla de resultados
+async function loadCausas() {
+   // console.log("intento cargar")
+    try {
+        const causasSnapshot = await getDocs(collection(db, "causas"));
+        resultsTableBody.innerHTML = ''; // Limpiar el contenido de la tabla antes de agregar nuevos datos
+
+        // Construir las filas de la tabla con los datos obtenidos
+        causasSnapshot.forEach((doc) => {
+            const data = doc.data();
+           // console.log(data); // Debug para verificar los datos
+            if (data) {
+                const row = `
+                    <tr>
+                        <td>${data.rut}</td>
+                        <td>${data.nombre}</td>
+                        <td>${data.rol}</td>
+                        <td>${data.fechaIngreso}</td>
+                        <td>${data.tribunal}</td>
+                        <td>${data.abogadoResponsable}</td>
+                        <td>${data.estado}</td>
+                    </tr>
+                `;
+                resultsTableBody.innerHTML += row;
+            }
+        });
+
+    
+
+        // Si ya hay una instancia de DataTable, destrúyela primero
+        if ($.fn.DataTable.isDataTable('#causasTable')) {
+            $('#causasTable').DataTable().destroy();
+        }
+
+        // Inicializa DataTable después de agregar los datos
+        $('#causasTable').DataTable({
+            language: {
+                emptyTable: "No hay datos disponibles en la tabla",
+                lengthMenu: "Mostrar _MENU_ entradas",
+                search: "Buscar:",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            },
+            columnDefs: [
+                { targets: '_all', className: 'dt-center' } // Centrar todas las columnas
+            ],
+            order: [[0, 'asc']], // Ordenar por la primera columna por defecto
+            responsive: true,    // Hacer que la tabla sea responsive
+            destroy: true,       // Permitir la destrucción de la tabla para reinicializarla
+        });
+    } catch (e) {
+        console.error("Error al cargar causas: ", e);
+    }
+
+
+};
