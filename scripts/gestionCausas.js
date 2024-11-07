@@ -1,7 +1,7 @@
 import { collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { db } from "../firebaseConfig.js"; // Importar la instancia inicializada de Firestore desde firebaseConfig.js
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () { 
     const addCauseButton = document.getElementById('addCause');
     const addCauseModal = document.getElementById('addCauseModal');
     const closeModalButtons = document.querySelectorAll('.close');
@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Abrir el modal al hacer clic en "Agregar Nueva Causa"
     addCauseButton.addEventListener('click', function () {
-  
+
         addCauseModal.style.display = 'block';
         loadDropdownOptions(); // Cargar opciones al abrir el modal
     });
-
+    
     // Cerrar los modales al hacer clic en la "X"
     closeModalButtons.forEach(button => {
         button.addEventListener('click', function () {
@@ -142,8 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-// Función para validar el formulario
-function validateForm() {
+  // Función para validar el formulario
+  function validateForm() {
     let isValid = true;
     const rut = document.getElementById('entityRut').value;
     if (!/^[0-9]{7,8}-[0-9kK]$/.test(rut) || !validateRut(rut)) {
@@ -176,10 +176,10 @@ function validateForm() {
     }
 
     return isValid;
-}
+ }
 
-// Función para validar el RUT con dígito verificador
-function validateRut(rut) {
+  // Función para validar el RUT con dígito verificador
+ function validateRut(rut) {
     if (!/^[0-9]+-[0-9kK]$/.test(rut)) {
         return false;
     }
@@ -193,103 +193,161 @@ function validateRut(rut) {
     const dvEsperado = 11 - (suma % 11);
     const dvFinal = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
     return dvFinal.toLowerCase() === dv.toLowerCase();
+ }
+
+
+   // Cargar opciones de listas desplegables desde Firestore
+async function loadDropdownOptions() {
+    try {
+        // Cargar Clientes, Abogados, Receptores Judiciales y Abogados Coordinadores desde Entidades
+        const entidadesSnapshot = await getDocs(collection(db, "Entidades"));
+        const clientes = [];
+        const abogados = [];
+        const receptores = [];
+        const abogadosCoordinadores = [];
+
+        entidadesSnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.TipoEntidad === "Cliente") {
+                clientes.push({ Rut: data.Rut, Nombre: data.Nombre });
+            } else if (data.TipoEntidad === "Abogado") {
+                abogados.push(data.Nombre);
+            } else if (data.TipoEntidad === "Receptor Judicial") {
+                receptores.push(data.Nombre);
+            } else if (data.TipoEntidad === "Abogado Coordinador") {
+                abogadosCoordinadores.push(data.Nombre);
+            }
+        });
+
+        // Cargar Tribunales
+        const tribunalesSnapshot = await getDocs(collection(db, "Tribunales"));
+        const tribunales = tribunalesSnapshot.docs.map(doc => doc.data().Descripcion);
+
+        // Cargar Tipos de Servicio
+        const tiposServicioSnapshot = await getDocs(collection(db, "TipoServicio"));
+        const tiposServicio = tiposServicioSnapshot.docs.map(doc => doc.data().Descripcion);
+
+        // Cargar Estados
+        const estadosSnapshot = await getDocs(collection(db, "EstadoJudicial"));
+        const estados = estadosSnapshot.docs.map(doc => doc.data().Descripcion);
+
+        document.getElementById('cliente').innerHTML = clientes.map(cliente =>
+            `<option value="${cliente.Rut}">${cliente.Nombre}</option>`
+        ).join('');
+        
+
+        // Llenar las demás listas desplegables
+        document.getElementById('tribunal').innerHTML = tribunales.map(t => `<option value="${t}">${t}</option>`).join('');
+        document.getElementById('abogadoResponsable').innerHTML = abogados.map(a => `<option value="${a}">${a}</option>`).join('');
+        document.getElementById('abogadoCoordinador').innerHTML = abogadosCoordinadores.map(ac => `<option value="${ac}">${ac}</option>`).join('');
+        document.getElementById('receptorJudicial').innerHTML = receptores.map(r => `<option value="${r}">${r}</option>`).join('');
+        document.getElementById('estado').innerHTML = estados.map(e => `<option value="${e}">${e}</option>`).join('');
+        document.getElementById('tipoServicio').innerHTML = tiposServicio.map(ts => `<option value="${ts}">${ts}</option>`).join('');
+
+        // Cargar Asistentes Legales como opciones de lista desplegable con selección múltiple
+        document.getElementById('asistentesLegales').innerHTML = abogados.map(a => `<option value="${a}">${a}</option>`).join('');
+    } catch (e) {
+        console.error("Error al cargar opciones de las listas desplegables: ", e);
+    }
 }
 
+// Manejar el envío del formulario para agregar una nueva causa
+newCauseForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-    // Cargar opciones de listas desplegables desde Firestore
-    async function loadDropdownOptions() {
-        try {
-            // Cargar Clientes, Abogados, Receptores Judiciales y Abogados Coordinadores desde Entidades
-            const entidadesSnapshot = await getDocs(collection(db, "Entidades"));
-            const clientes = [];
-            const abogados = [];
-            const receptores = [];
-            const abogadosCoordinadores = [];
+    // Confirmar que la función se ejecuta
+    console.log("Evento submit disparado para agregar una nueva causa.");
 
-            entidadesSnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.TipoEntidad === "Cliente") {
-                    clientes.push(data.Nombre);
-                } else if (data.TipoEntidad === "Abogado") {
-                    abogados.push(data.Nombre);
-                } else if (data.TipoEntidad === "Receptor Judicial") {
-                    receptores.push(data.Nombre);
-                } else if (data.TipoEntidad === "Abogado Coordinador") {
-                    abogadosCoordinadores.push(data.Nombre);
-                }
-            });
-
-            // Cargar Tribunales
-            const tribunalesSnapshot = await getDocs(collection(db, "Tribunales"));
-            const tribunales = tribunalesSnapshot.docs.map(doc => doc.data().Descripcion);
-
-            // Cargar Tipos de Servicio
-            const tiposServicioSnapshot = await getDocs(collection(db, "TipoServicio"));
-            const tiposServicio = tiposServicioSnapshot.docs.map(doc => doc.data().Descripcion);
-
-            // Cargar Estados
-            const estadosSnapshot = await getDocs(collection(db, "EstadoJudicial"));
-            const estados = estadosSnapshot.docs.map(doc => doc.data().Descripcion);
-
-            document.getElementById('cliente').innerHTML = clientes.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('tribunal').innerHTML = tribunales.map(t => `<option value="${t}">${t}</option>`).join('');
-            document.getElementById('abogadoResponsable').innerHTML = abogados.map(a => `<option value="${a}">${a}</option>`).join('');
-            document.getElementById('abogadoCoordinador').innerHTML = abogadosCoordinadores.map(ac => `<option value="${ac}">${ac}</option>`).join('');
-            document.getElementById('receptorJudicial').innerHTML = receptores.map(r => `<option value="${r}">${r}</option>`).join('');
-            document.getElementById('estado').innerHTML = estados.map(e => `<option value="${e}">${e}</option>`).join('');
-            document.getElementById('tipoServicio').innerHTML = tiposServicio.map(ts => `<option value="${ts}">${ts}</option>`).join('');
-
-            // Cargar Asistentes Legales como opciones de lista desplegable con selección múltiple
-            document.getElementById('asistentesLegales').innerHTML = abogados.map(a => `<option value="${a}">${a}</option>`).join('');
-        } catch (e) {
-            console.error("Error al cargar opciones de las listas desplegables: ", e);
-        }
+    // Verificar si el formulario y los elementos existen
+    if (!newCauseForm) {
+        console.error("No se encontró el formulario 'newCauseForm'.");
+        return;
     }
 
-    // Manejar el envío del formulario para agregar una nueva causa
-    newCauseForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-    
-        // Capturar los datos del formulario
-        const asistentesLegalesSeleccionados = Array.from(document.getElementById('asistentesLegales').selectedOptions).map(option => option.value);
-    
-        const nuevaCausa = {
-            rut: document.getElementById('cliente').value,
-            nombre: document.getElementById('cliente').selectedOptions[0].text,
-            rol: document.getElementById('rol').value,
-            fechaIngreso: document.getElementById('fechaIngreso').value,
-            tribunal: document.getElementById('tribunal').value,
-            abogadoResponsable: document.getElementById('abogadoResponsable').value,
-            estado: document.getElementById('estado').value,
-            tipoServicio: document.getElementById('tipoServicio').value,
-            receptorJudicial: document.getElementById('receptorJudicial').value,
-            abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
-            asistentesLegales: asistentesLegalesSeleccionados,
-        };
-    
-        // Guardar la nueva causa en Firestore
-        try {
-            await addDoc(collection(db, "causas"), nuevaCausa);
-           // console.log("Causa agregada con éxito.");
-        
-            // Cargar las causas nuevamente para actualizar la tabla
-            loadCausas();
-        } catch (e) {
-            console.error("Error al agregar causa: ", e);
-        }
-    
-        // Cerrar el modal y limpiar el formulario
-        addCauseModal.style.display = 'none';
-        newCauseForm.reset();
-    });
-    
-    // Función para mostrar el modal reutilizado
-    function showModal(title, formContent, onSaveCallback) {
-        document.getElementById('modalTitle').innerText = title;
-        maintainerForm.innerHTML = formContent;
-        maintainerForm.onsubmit = onSaveCallback;
-        maintainerModal.style.display = 'block';
+    // Capturar los datos del formulario
+    const asistentesLegalesElement = document.getElementById('asistentesLegales');
+    if (!asistentesLegalesElement) {
+        console.error("No se encontró el elemento 'asistentesLegales'.");
+        return;
     }
+    const asistentesLegalesSeleccionados = Array.from(asistentesLegalesElement.selectedOptions).map(option => option.value);
+
+    // Obtener el RUT y el nombre del cliente seleccionado correctamente
+    const clienteSelect = document.getElementById('cliente');
+    if (!clienteSelect) {
+        console.error("No se encontró el elemento 'cliente'.");
+        return;
+    }
+    if (!clienteSelect.value) {
+        alert("Por favor seleccione un cliente.");
+        return;
+    }
+    
+    // Capturar el valor correcto del RUT del cliente seleccionado
+    const rutClienteSeleccionado = clienteSelect.value; // Esto toma el valor correcto del `value` en la opción seleccionada.
+    const nombreClienteSeleccionado = clienteSelect.options[clienteSelect.selectedIndex].text; // Captura el nombre del cliente desde el texto de la opción.
+
+    // Mensajes de consola para verificar el RUT y nombre del cliente
+    console.log("RUT del cliente seleccionado:", rutClienteSeleccionado);
+    console.log("Nombre del cliente seleccionado:", nombreClienteSeleccionado);
+
+    // Capturar el valor del campo 'rol' de la nueva causa
+    const rolElement = document.getElementById('rolCausa'); // Cambiado a 'rolCausa' para evitar conflictos
+    if (!rolElement) {
+        console.error("No se encontró el elemento 'rolCausa'.");
+        return;
+    }
+    const rolValor = rolElement.value;
+
+    // Verificar si el rol tiene un valor antes de proceder
+    if (!rolValor || rolValor.trim() === "") {
+        alert("Por favor ingrese un rol válido.");
+        return; // No proceder si el rol está vacío
+    }
+
+    // Mensaje de consola para verificar el valor del rol
+   // console.log("Valor del rol:", rolValor);
+
+    // Crear el objeto de la nueva causa
+    const nuevaCausa = {
+        rut: rutClienteSeleccionado, // Guardar el RUT del cliente seleccionado
+        nombre: nombreClienteSeleccionado, // Guardar el nombre del cliente seleccionado
+        rol: rolValor, // Guardar el valor del rol ingresado
+        fechaIngreso: document.getElementById('fechaIngreso').value,
+        tribunal: document.getElementById('tribunal').value,
+        abogadoResponsable: document.getElementById('abogadoResponsable').value,
+        estado: document.getElementById('estado').value,
+        tipoServicio: document.getElementById('tipoServicio').value,
+        receptorJudicial: document.getElementById('receptorJudicial').value,
+        abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
+        asistentesLegales: asistentesLegalesSeleccionados,
+    };
+
+    // Guardar la nueva causa en Firestore
+    try {
+        await addDoc(collection(db, "causas"), nuevaCausa);
+       // console.log("Causa agregada con éxito.");
+
+        // Cargar las causas nuevamente para actualizar la tabla
+        loadCausas();
+    } catch (e) {
+        console.error("Error al agregar causa: ", e);
+    }
+
+    // Cerrar el modal y limpiar el formulario
+    addCauseModal.style.display = 'none';
+    newCauseForm.reset();
+});
+
+
+// Función para mostrar el modal reutilizado
+function showModal(title, formContent, onSaveCallback) {
+    document.getElementById('modalTitle').innerText = title;
+    maintainerForm.innerHTML = formContent;
+    maintainerForm.onsubmit = onSaveCallback;
+    maintainerModal.style.display = 'block';
+}
+
 
     /* ====================
        MODAL BOTON HONORARIOS 
@@ -380,15 +438,31 @@ document.getElementById('honorariosForm').addEventListener('submit', function (e
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadCausas(); // Llamar la función una vez que el DOM esté completamente cargado
+    console.log("DOM completamente cargado y analizado.");
+
+    const newCauseForm = document.getElementById('newCauseForm');
+    if (newCauseForm) {
+        console.log("Formulario 'newCauseForm' encontrado.");
+
+        newCauseForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            console.log("Evento submit disparado para agregar una nueva causa.");
+
+            // Capturar los datos del formulario aquí
+            // ...
+        });
+    } else {
+        console.error("No se encontró el formulario 'newCauseForm'.");
+    }
 });
+
 
 window.loadCausas = loadCausas;
 
 
 // Función para cargar y mostrar las causas en la tabla de resultados
 async function loadCausas() {
-   // console.log("intento cargar")
+    console.log("intento cargar")
     try {
         const causasSnapshot = await getDocs(collection(db, "causas"));
         resultsTableBody.innerHTML = ''; // Limpiar el contenido de la tabla antes de agregar nuevos datos
