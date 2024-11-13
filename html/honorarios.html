@@ -4,102 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Honorarios</title>
-    <link rel="stylesheet" href="../css/menu.css"> <!-- Estilos de la barra lateral -->
-    <link rel="stylesheet" href="../css/gestionCausas.css"> <!-- Utilizamos los mismos estilos que la gestión de causas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../css/menu.css"> 
+    <link rel="stylesheet" href="../css/gestionCausas.css"> 
+    <link rel="stylesheet" href="../css/sidebar.css">
 </head>
 <body>
     <!-- Barra lateral -->
-    <div class="sidebar">
-        <h2 style="text-align: center;">MBC<br> Abogados S.A</h2>
-        <ul>
-            <li><a href="menu.html"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="gestionCausas.html"><i class="fas fa-gavel"></i> Gestión de Causas</a></li>
-            <li><a href="#" class="active"><i class="fas fa-dollar-sign"></i> Honorarios</a></li>
-            <li><a href="seguimiento.html"><i class="fas fa-calendar-alt"></i> Seguimiento</a></li>
-            <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
-            <li><a href="mantenedores.html"><i class="fas fa-tools"></i> Mantenedores</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#"><i class="far fa-question-circle"></i> Ayuda</a><br>
-            <a href="#" id="logout"><i class="fas fa-door-open"></i> Salir</a>
-        </div>
-    </div>
+    <div id="sidebar-container"></div>
 
-    <!-- Contenido principal -->
-    <div class="main-content">
-        <header>
-            <h1>Gestión de Honorarios</h1>
-        </header>
-        <main>
-            <section class="filter-section">
-                <form id="searchForm">
-                    <div class="form-group">
-                        <label for="periodoDesde">Periodo Desde:</label>
-                        <input type="date" id="periodoDesde" name="periodoDesde">
-                    </div>
-                    <div class="form-group">
-                        <label for="periodoHasta">Periodo Hasta:</label>
-                        <input type="date" id="periodoHasta" name="periodoHasta">
-                    </div>
-                    <div class="form-group">
-                        <label for="rut">RUT Cliente:</label>
-                        <input type="text" id="rut" name="rut" placeholder="Ej: 12345678-9">
-                    </div>
-                    <button type="submit" id="buscar">Buscar</button>
-                    <button type="button" id="exportar">Exportar</button>
-                </form>
-            </section>
-
-            <section class="results-section">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>RUT Cliente</th>
-                            <th>Nombre Cliente</th>
-                            <th>ROL / Año</th>
-                            <th>Tipo de Documento</th>
-                            <th>N.º de Documento</th>
-                            <th>Fecha</th>
-                            <th>Monto</th>
-                            <th>Abono</th>
-                            <th>Saldo</th>
-                            <th>Pagar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTableBody">
-                        <!-- Resultados se cargarán aquí -->
-                    </tbody>
-                </table>
-            </section>
-        </main>
-
-        <!-- Modal para pagos -->
-        <div id="paymentModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Realizar Pago / Abono</h2>
-                <form id="paymentForm">
-                    <div class="form-group">
-                        <label for="rutClientePago">RUT Cliente:</label>
-                        <input type="text" id="rutClientePago" name="rutClientePago" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="nombreClientePago">Nombre Cliente:</label>
-                        <input type="text" id="nombreClientePago" name="nombreClientePago" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="montoPagar">Monto a Pagar / Abonar:</label>
-                        <input type="number" id="montoPagar" name="montoPagar" min="0" required>
-                    </div>
-                    <button type="submit" id="realizarPago">Realizar Pago</button>
-                </form>
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <header>
+                <h1>Gestión de Honorarios</h1>
+            </header>
+            <main>
+                <section class="filter-section">
+                    <form id="searchForm">
+                        <div class="form-group">
+                            <label for="periodoDesde">Periodo Desde:</label>
+                            <input type="date" id="periodoDesde" name="periodoDesde">
+                        </div>
+                        <div class="form-group">
+                            <label for="periodoHasta">Periodo Hasta:</label>
+                            <input type="date" id="periodoHasta" name="periodoHasta">
+                        </div>
+                        <div class="form-group">
+                            <label for="rut">RUT Cliente:</label>
+                            <input type="text" id="rut" name="rut" placeholder="Ej: 12345678-9">
+                        </div>
+                        <button type="submit" id="buscar">Buscar</button>
+                        <button type="button" id="exportar">Exportar</button>
+                    </form>
+                </section>
+    
+                <section class="results-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>RUT Cliente</th>
+                                <th>Nombre Cliente</th>
+                                <th>ROL / Año</th>
+                                <th>Tipo de Documento</th>
+                                <th>N.º de Documento</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Abono</th>
+                                <th>Saldo</th>
+                                <th>Pagar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Resultados se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </section>
+            </main>
+    
+            <!-- Modal para pagos -->
+            <div id="paymentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Realizar Pago / Abono</h2>
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="rutClientePago">RUT Cliente:</label>
+                            <input type="text" id="rutClientePago" name="rutClientePago" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombreClientePago">Nombre Cliente:</label>
+                            <input type="text" id="nombreClientePago" name="nombreClientePago" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="montoPagar">Monto a Pagar / Abonar:</label>
+                            <input type="number" id="montoPagar" name="montoPagar" min="0" required>
+                        </div>
+                        <button type="submit" id="realizarPago">Realizar Pago</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js"></script>
     <script src="../scripts/honorarios.js"></script>
+    <script src="../scripts/sidebarLoader.js" defer></script>
+
+
 </body>
 </html>

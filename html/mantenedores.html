@@ -1,42 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mantenedores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="../css/menu.css">
     <link rel="stylesheet" href="../css/mantenedores.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    
+    <link rel="stylesheet" href="../css/sidebar.css">
 
 <body>
-    
+
 
     <!-- Barra lateral -->
-    <div class="sidebar">
-        <h2 style="text-align: center;">MBC<br> Abogados S.A</h2>
-        <ul>
-            <li><a href="menu.html"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="gestionCausas.html"><i class="fas fa-gavel"></i> Gestión de Causas</a></li>
-            <li><a href="honorarios.html"><i class="fas fa-dollar-sign"></i> Honorarios</a></li>
-            <li><a href="seguimiento.html"><i class="fas fa-calendar-alt"></i> Seguimiento</a></li>
-            <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
-            <li><a href="#" class="active"><i class="fas fa-tools"></i> Mantenedores</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#"><i class="far fa-question-circle"></i> Ayuda</a><br>
-            <a href="#" id="logout"><i class="fas fa-door-open"></i> Salir</a>
-        </div>
-    </div>
+    <div id="sidebar-container"></div>
 
     <!-- Contenido principal -->
     <div class="main-content">
         <header>
             <h1>Mantenedores</h1>
         </header>
-        
+
         <!-- Contenido principal de las pestañas -->
         <main>
             <!-- Navegación de pestañas -->
@@ -46,7 +32,7 @@
                 <button class="tab-button" data-tab="tribunales">Tribunales</button>
                 <button class="tab-button" data-tab="estados">Estados</button>
             </div>
-            
+
             <!-- Contenido de cada pestaña -->
             <section id="entidades" class="tab-content active">
                 <h2>Entidades</h2>
@@ -68,7 +54,7 @@
                     </tbody>
                 </table>
             </section>
-        
+
             <section id="tipos-servicio" class="tab-content">
                 <h2>Tipos de Servicios</h2>
                 <button id="addServiceType" class="add-button">Agregar Nuevo Servicio</button>
@@ -85,7 +71,7 @@
                     </tbody>
                 </table>
             </section>
-        
+
             <section id="tribunales" class="tab-content">
                 <h2>Tribunales</h2>
                 <button id="addCourt" class="add-button">Agregar Nuevo Tribunal</button>
@@ -102,7 +88,7 @@
                     </tbody>
                 </table>
             </section>
-        
+
             <section id="estados" class="tab-content">
                 <h2>Estados</h2>
                 <button id="addState" class="add-button">Agregar Nuevo Estado</button>
@@ -119,7 +105,7 @@
                     </tbody>
                 </table>
             </section>
-        </main>   
+        </main>
 
         <!-- Modal para agregar o editar -->
         <div id="maintainerModal" class="modal">
@@ -135,8 +121,11 @@
             </div>
         </div>
 
-     <script type="module" src="../scripts/mantenedores.js"></script>
-    
-     
+        <script type="module" src="../scripts/mantenedores.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script src="../scripts/sidebarLoader.js" defer></script>
+
 </body>
+
 </html>

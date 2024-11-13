@@ -4,31 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Causas</title>    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="../css/menu.css"> <!-- Estilos de barra lateral -->
     <link rel="stylesheet" href="../css/gestionCausas.css"> <!-- Estilos de la interfaz de gestión de causas -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-
+    <link rel="stylesheet" href="../css/sidebar.css">
 </head>
 <body>
 
-    <!-- Barra lateral (copiada de menu.html) -->
-    <div class="sidebar">
-        <h2 style="text-align: center;">MBC<br> Abogados S.A</h2>
-        <ul>
-            <li><a href="menu.html"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="#" class="active"><i class="fas fa-gavel"></i> Gestión de Causas</a></li>
-            <li><a href="honorarios.html"><i class="fas fa-dollar-sign"></i> Honorarios</a></li>
-            <li><a href="seguimiento.html"><i class="fas fa-calendar-alt"></i> Seguimiento</a></li>
-            <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
-            <li><a href="mantenedores.html"><i class="fas fa-tools"></i> Mantenedores</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#"><i class="far fa-question-circle"></i> Ayuda</a><br>
-            <a href="#" id="logout"><i class="fas fa-door-open"></i> Salir</a>
-        </div>
-    </div>
+    <!-- Barra lateral -->
+    <div id="sidebar-container"></div>
 
     
     <!-- Contenido principal -->
@@ -38,33 +23,7 @@
         </header>
         
     <main>
-        <section class="filter-section">
-            <form id="searchForm">
-                <div class="form-group">
-                    <label for="periodoDesde">Periodo Desde:</label>
-                    <input type="date" id="periodoDesde" name="periodoDesde">
-                </div>
         
-                <div class="form-group">
-                    <label for="periodoHasta">Periodo Hasta:</label>
-                    <input type="date" id="periodoHasta" name="periodoHasta">
-                </div>
-        
-                <div class="form-group">
-                    <label for="rol">RIT / ROL:</label>
-                    <input type="text" id="rol" name="rol" placeholder="Ej: 543-2024">
-                </div>
-        
-                <div class="form-group">
-                    <label for="otroTipo">Otro tipo de búsqueda:</label>
-                    <input type="text" id="buscador" name="rut" placeholder="Rut, Nombre, Tribunal, Abogado, Estado">
-                </div>
-        
-                <button type="submit" id="buscar">Buscar</button>
-                <button type="button" id="exportar">Exportar</button>
-            </form>
-        </section>
-
         <section class="results-section">
             <button id="addCause">Agregar Nueva Causa</button>
             <table id="causasTable" class="display">
@@ -77,6 +36,7 @@
                         <th>Tribunal</th>
                         <th>Abogado Responsable</th>
                         <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="resultsTableBody">
@@ -117,11 +77,16 @@
                     </select>
                 </div>
                 <div class="form-column">
+                    <label for="asistentesLegalesContainer">Asistentes Legales Asignados:</label>
+    <div id="asistentesLegalesContainer"></div>
+
+                    <!---
                     <label for="asistentesLegales">Asistentes Legales Asignados:</label>
                     <select id="asistentesLegales" name="asistentesLegales" multiple required>
                         <option value="">Seleccione asistentes legales</option>
-                        <!-- Opciones dinámicas -->
+                        
                     </select>
+                        -->
                 </div>
             </div>
         
@@ -129,7 +94,7 @@
             <div class="form-row">
                 <div class="form-column">
                     <label for="rol">ROL / Año:</label>
-                    <input type="text" id="rol" name="rol" placeholder="Ej: 543-2024" required>
+                    <input type="text" id="rolCausa" name="rol" placeholder="Ej: 543-2024" required>
                 </div>
                 <div class="form-column">
                     <label for="demandado">Demandado:</label>
@@ -297,9 +262,12 @@
     </div>
 </div>
 
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script type="module" src="../scripts/gestionCausas.js"></script>
-
-
+<script src="../scripts/sidebarLoader.js" defer></script>
 
 </body>
 </html>

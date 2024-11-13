@@ -6,25 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Web de Gestión de Casos Judiciales</title>
     <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
 </head>
 <body>
 
     <!-- Barra lateral -->
-    <div class="sidebar">
-        <h2 style="text-align: center;">MBC<br> Abogados S.A</h2>
-        <ul>
-            <li><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="../html/gestionCausas.html" id="sidebar-gestion-causas"><i class="fas fa-gavel"></i> Gestión de Causas</a></li>
-            <li><a href="../html/honorarios.html" id="sidebar-honorarios"><i class="fas fa-gavel"></i> Honorarios</a></li>
-            <li><a href="seguimiento.html"><i class="fas fa-calendar-alt"></i> Seguimiento</a></li>
-            <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
-            <li><a href="mantenedores.html"><i class="fas fa-tools"></i> Mantenedores</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#"><i class="far fa-question-circle"></i> Ayuda</a><br>
-            <a href="#" id="logout"><i class="fas fa-door-open"></i> Salir</a>
-        </div>
-    </div>
+    <div id="sidebar-container"></div>
 
     <!-- Contenido principal -->
     <div class="main-content">
@@ -57,9 +44,9 @@
                     <h3>Honorarios</h3>
                 </a>
             </div>
-            <div class="card" id="main-seguimiento">
-                <img src="../imagenes/logo_modulo_Seguimiento.png" alt="Seguimiento">
-                <h3>Seguimiento</h3>
+            <div class="card" id="main-eventos">
+                <img src="../imagenes/logo_modulo_Seguimiento.png" alt="Eventos">
+                <h3>Eventos</h3>
             </div>
             <div class="card" id="main-reportes">
                 <img src="../imagenes/logo_modulo_Reportes.jpg" alt="Reportes">
@@ -69,7 +56,9 @@
     </div>
 
     <!-- Importar iconos desde Font Awesome -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" defer></script>
+    
     <script src="../scripts/menu.js" defer></script>
+    <script src="../scripts/sidebarLoader.js" defer></script>
+
 </body>
 </html>
