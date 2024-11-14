@@ -1,9 +1,11 @@
+/* Estilos generales de la página */
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
     margin: 0;
 }
 
+/* Encabezado */
 header {
     background-color: #2c3e50;
     color: white;
@@ -11,6 +13,7 @@ header {
     text-align: center;
 }
 
+/* Sección de filtros */
 .filter-section {
     padding: 20px;
     background-color: #ecf0f1;
@@ -27,23 +30,37 @@ header {
 .filter-section label {
     margin-right: 0.1rem;
     flex-basis: 100%;
-    font-size: 0.9rem;/* Tamaño de fuente más pequeño para las etiquetas */
+    font-size: 0.9rem; /* Tamaño de fuente para etiquetas */
 }
 
+/* Estilos para campos de entrada y botones */
 input, button {
     padding: 10px;
-    font-size: 0.9rem; /* Tamaño de fuente más pequeño para los campos de entrada y botones */
+    font-size: 0.9rem; /* Tamaño de fuente para campos de entrada y botones */
     border: 1px solid #bdc3c7;
     border-radius: 5px;
 }
 
-button {
-    background-color: #3498db;
+/* Botones de acción en tablas */
+button {    
     color: white;
     cursor: pointer;
     border: none;
 }
 
+/* Estilo específico para el botón de "Editar" */
+.edit-button {
+    background-color: #e96e10; /* Naranja para "Editar" */
+}
+
+
+/* Estilo específico para el botón de "Eliminar" */
+.delete-button {
+    background-color: #ed2e19;/* Rojo para "Eliminar" */
+}
+
+
+/* Estilos para la sección de resultados */
 .results-section {
     padding: 20px;
 }
@@ -66,11 +83,12 @@ th {
     color: white;
 }
 
+/* Estilos del botón "Agregar Nueva Causa" */
 #addCause {
     display: block;
-    margin: 0,5px auto 10px auto; /* Centra el botón, añade margen inferior y disminuye el margen superior*/;
+    margin: 0.5px auto 10px auto; /* Centra el botón y añade márgenes */
     padding: 10px 20px;
-    background-color: #2ecc71;
+    background-color: #3498db;
     color: white;
     border: none;
     cursor: pointer;
@@ -102,6 +120,7 @@ th {
     overflow-y: auto;
 }
 
+/* Botón de cierre del modal */
 .close {
     color: #aaa;
     float: right;
@@ -128,27 +147,27 @@ th {
     flex-direction: column;
 }
 
-/* Clase específica para filas de una sola columna */
+/* Filas de una sola columna */
 .full-width-row {
     grid-template-columns: 1fr; /* Una sola columna */
 }
 
-/* Hacer que .full-width ocupe todo el ancho de la fila */
+/* Clase para elementos de ancho completo */
 .full-width {
     grid-column: span 2;
 }
 
-/* Botones "Agregar" (+) */
+/* Botón "Agregar" (+) en formularios */
 .add-button {
     background-color: #39c5be;
     color: white;
     border: none;
-    padding: 4px; /* Ajusta el padding para reducir el tamaño */
+    padding: 4px; /* Tamaño reducido */
     font-size: 14px;
     cursor: pointer;
-    border-radius: 4px; /* Cuadrado */
-    width: 5px; /* Ajusta el ancho */
-    height: 25px; /* Ajusta la altura */
+    border-radius: 4px;
+    width: 5px;
+    height: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -158,7 +177,7 @@ th {
     background-color: #92ebf3;
 }
 
-/* Estilos de etiquetas y campos en el formulario */
+/* Estilos para etiquetas y campos en el formulario dentro del modal */
 .modal-content label {
     display: block;
     font-weight: bold;
@@ -174,12 +193,13 @@ th {
     box-sizing: border-box;
 }
 
-/* Alineación de los botones Guardar y Honorarios */
+/* Alineación de los botones de acción en formularios */
 .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
+
 .form-actions button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -188,13 +208,9 @@ th {
     cursor: pointer;
 }
 
+/* Estilos para botones específicos de formulario */
 button[type="submit"] {
     background-color: #4CAF50;
-    color: white;
-}
-
-#honorariosButton {
-    background-color: #3498db;
     color: white;
 }
 
@@ -202,6 +218,35 @@ button[type="submit"]:hover {
     background-color: #45a049;
 }
 
+#honorariosButton {
+    background-color: #3498db;
+    color: white;
+}
+
 #honorariosButton:hover {
     background-color: #2980b9;
+}
+
+/* Contenedor de Asistentes Legales en columnas */
+#asistentesLegalesContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+    gap: 10px;
+}
+
+#asistentesLegalesContainer div {
+    min-width: 150px; /* Ancho mínimo de cada elemento */
+    display: flex;
+    align-items: center;
+}
+
+#asistentesLegalesContainer label {
+    font-weight: normal; /* Sin negrita */
+    font-size: 0.85rem; /* Tamaño de letra más pequeño */
+}
+
+/* Estilo para el asterisco en campos obligatorios */
+.required {
+    color: red;
+    font-weight: bold;
 }

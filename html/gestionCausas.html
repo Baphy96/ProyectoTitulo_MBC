@@ -35,6 +35,8 @@
                         <th>Fecha de Ingreso</th>
                         <th>Tribunal</th>
                         <th>Abogado Responsable</th>
+                        <th>Tipo de Servicio</th>
+                        <th>Honorarios</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -57,7 +59,7 @@
 
             <!-- Fila 1: Cliente -->
             <div class="form-row full-width-row">
-                <label for="cliente">Cliente:</label>
+                <label for="cliente">Cliente:<span class="required">*</span></label>
                 <div class="select-group">
                     <select id="cliente" name="cliente" required>
                         <option value="">Seleccione un cliente</option>
@@ -70,7 +72,7 @@
             <!-- Fila 2: Abogado Responsable y Asistentes Legales -->
             <div class="form-row">
                 <div class="form-column">
-                    <label for="abogadoResponsable">Abogado Responsable:</label>
+                    <label for="abogadoResponsable">Abogado Responsable:<span class="required">*</span></label>
                     <select id="abogadoResponsable" name="abogadoResponsable" required>
                         <option value="">Seleccione un abogado responsable</option>
                         <!-- Opciones dinámicas -->
@@ -78,38 +80,30 @@
                 </div>
                 <div class="form-column">
                     <label for="asistentesLegalesContainer">Asistentes Legales Asignados:</label>
-    <div id="asistentesLegalesContainer"></div>
-
-                    <!---
-                    <label for="asistentesLegales">Asistentes Legales Asignados:</label>
-                    <select id="asistentesLegales" name="asistentesLegales" multiple required>
-                        <option value="">Seleccione asistentes legales</option>
-                        
-                    </select>
-                        -->
+    <div id="asistentesLegalesContainer"></div>                
                 </div>
             </div>
         
             <!-- Fila 3: ROL / Año y Demandado -->
             <div class="form-row">
                 <div class="form-column">
-                    <label for="rol">ROL / Año:</label>
-                    <input type="text" id="rolCausa" name="rol" placeholder="Ej: 543-2024" required>
+                    <label for="rol">ROL / Año:<span class="required">*</span></label>
+                    <input type="text" id="rolCausa" name="rol" placeholder="Ej: 123-2024" required>
                 </div>
                 <div class="form-column">
                     <label for="demandado">Demandado:</label>
-                    <input type="text" id="demandado" name="demandado" placeholder="Nombre del Demandado" required>
+                    <input type="text" id="demandado" name="demandado" placeholder="Nombre del Demandado">
                 </div>
             </div>
         
             <!-- Fila 4: Fecha de Ingreso y Tipo de Servicio -->
             <div class="form-row">
                 <div class="form-column">
-                    <label for="fechaIngreso">Fecha de Ingreso:</label>
+                    <label for="fechaIngreso">Fecha de Ingreso:<span class="required">*</span></label>
                     <input type="date" id="fechaIngreso" name="fechaIngreso" required>
                 </div>
                 <div class="form-column">
-                    <label for="tipoServicio">Tipo de Servicio:</label>
+                    <label for="tipoServicio">Tipo de Servicio:<span class="required">*</span></label>
                     <select id="tipoServicio" name="tipoServicio" required>
                         <option value="">Seleccione un tipo de servicio</option>
                         <!-- Opciones dinámicas -->
@@ -120,7 +114,7 @@
             <!-- Fila 5: Tribunal -->
             <div class="form-row full-width-row">
                 <label for="tribunal">Tribunal:</label>
-                <select id="tribunal" name="tribunal" required>
+                <select id="tribunal" name="tribunal">
                     <option value="">Seleccione un tribunal</option>
                     <!-- Opciones dinámicas -->
                 </select>
@@ -131,7 +125,7 @@
                 <div class="form-column">
                     <label for="receptorJudicial">Receptor Judicial:</label>
                     <div class="select-group">
-                        <select id="receptorJudicial" name="receptorJudicial" required>
+                        <select id="receptorJudicial" name="receptorJudicial">
                             <option value="">Seleccione un receptor</option>
                             <!-- Opciones dinámicas -->
                         </select>
@@ -141,7 +135,7 @@
                 <div class="form-column">
                     <label for="abogadoCoordinador">Abogado Coordinador:</label>
                     <div class="select-group">
-                        <select id="abogadoCoordinador" name="abogadoCoordinador" required>
+                        <select id="abogadoCoordinador" name="abogadoCoordinador">
                             <option value="">Seleccione un abogado coordinador</option>
                             <!-- Opciones dinámicas -->
                         </select>
@@ -152,7 +146,7 @@
         
             <!-- Fila 7: Estado -->
             <div class="form-row full-width-row">
-                <label for="estado">Estado:</label>
+                <label for="estado">Estado:<span class="required">*</span></label>
                 <select id="estado" name="estado" required>
                     <option value="">Seleccione un estado</option>
                     <!-- Opciones dinámicas -->
