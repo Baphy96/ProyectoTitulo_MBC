@@ -5,6 +5,16 @@ body {
     margin: 0;
 }
 
+/* Contenedor principal */
+.main-content {
+    margin-left: 220px; /* Espacio equivalente al ancho de la barra lateral */
+    padding: 20px; /* Espacio interno */
+    width: 100vw; /* Ocupa el 100% del ancho de la ventana */
+    height: calc(100vh - 60px); /* Ocupa el 100% de la altura visible, menos el espacio reservado para un header u otros elementos */
+    box-sizing: border-box; /* Incluye padding y bordes en las dimensiones */    
+    overflow: auto; /* Permite scroll si el contenido es mayor que el contenedor */
+}
+
 /* Estilos de encabezado principal */
 .main-content header {
     background-color: #2c3e50;
@@ -17,6 +27,7 @@ body {
 /* Navegación de pestañas */
 .tabs {
     display: flex;
+    flex-wrap: wrap; /* Permite que las pestañas se ajusten en pantallas pequeñas */
     background-color: #2c3e50;
     padding: 10px;
 }
@@ -30,6 +41,7 @@ body {
     transition: background-color 0.3s;
     margin-right: 5px;
     font-size: 1rem;
+    flex: 1 1 auto; /* Permite que las pestañas se ajusten */
 }
 
 .tab-button.active {
@@ -48,7 +60,7 @@ body {
     padding: 20px;
     background-color: #ecf0f1;
     border-radius: 8px;
-    margin-top: 20px;
+    margin-top: 20px;    
 }
 
 .tab-content.active {
@@ -59,10 +71,10 @@ body {
 .maintainers-section {
     padding: 20px;
     background-color: #ecf0f1;
-    border-bottom: 2px solid #bdc3c7;
+    border-bottom: 2px solid #b8ccd8;
     border-radius: 8px;
     margin-bottom: 20px;
-}
+    }
 
 /* Botón de "Agregar Nuevo Registro" */
 .add-button {
@@ -74,6 +86,7 @@ body {
     cursor: pointer;
     margin-bottom: 10px;
     font-size: 1rem;
+    
 }
 
 .add-button:hover {
@@ -85,14 +98,15 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
-}
+    flex-wrap: wrap; /* Ajusta el formulario en pantallas pequeñas */
+    }
 
 .search-form input {
-    padding: 10px;
-    font-size: 0.9rem;
+    width: 100%; /* Ocupa todo el espacio disponible */
+    max-width: 300px; /* Limita el ancho máximo del campo */
+    padding: 8px;
     border: 1px solid #bdc3c7;
     border-radius: 5px;
-    width: 100%;
     box-sizing: border-box;
 }
 
@@ -115,13 +129,17 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);     
+
 }
 
 th, td {
     padding: 12px;
     border: 1px solid #bdc3c7;
     text-align: center;
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    text-overflow: ellipsis; /* Agrega "..." si el texto es muy largo */
+    overflow: hidden; /* Oculta el texto que exceda el ancho */
 }
 
 th {
@@ -131,6 +149,7 @@ th {
 
 td {
     background-color: #fefefe;
+    
 }
 
 /* Botones de acción en tablas */
@@ -174,18 +193,31 @@ button {
 }
 
 /* Botón de cierre del modal */
+/* Ajuste para el botón de cierre del modal ("X") */
 .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 0;
+    font-size: 1.5rem;
     color: #aaa;
-    float: right;
-    font-size: 28px;
     font-weight: bold;
+    border: none;
+    background: none;
+    width: auto; /* Asegura que el botón solo ocupe el espacio de la "X" */
+    height: auto; /* Evita que el botón de cierre ocupe más altura */
+    line-height: 1;
+    cursor: pointer;
 }
 
+
+/* Ajuste cuando se hace hover sobre el botón de cierre */
 .close:hover,
 .close:focus {
     color: black;
-    cursor: pointer;
+    opacity: 0.7;
 }
+
 
 /* Estilos de filas y columnas en formularios */
 .form-row {
@@ -225,3 +257,98 @@ button {
 .form-actions button:hover {
     background-color: #45a049;
 }
+
+/* Ajuste responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-button {
+        flex: 1 1 auto;
+        margin-bottom: 5px;
+    }
+
+    table {        
+        overflow-x: auto;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr; /* Cambiar a una sola columna */
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* Ajuste responsivo para pantallas grandes */
+@media (min-width: 1200px) {
+    .main-content {
+        width: 100vw; /* Asegura que ocupe el ancho completo */
+        height: 100vh; /* Asegura que ocupe la altura completa */
+    }
+}
+
+/* Ajuste responsivo para pantallas medianas */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .main-content {
+        max-width: 95%; /* Ajusta para pantallas medianas */
+    }
+}
+
+/* Ajustar el contenedor generado por DataTables */
+.dataTables_wrapper {
+    width: 100% !important; /* Asegurar que el contenedor de DataTables ocupe todo el ancho */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor general para los controles superiores de DataTables */
+.dataTables_wrapper .row:first-child {
+    display: flex;
+    justify-content: space-between; /* Distribuye los elementos a los extremos */
+    align-items: center; /* Alinea verticalmente los elementos */
+    gap: 20px; /* Añade espacio entre los elementos */
+    flex-wrap: wrap; /* Permite que los elementos se acomoden en varias filas si es necesario */
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+
+/* Ajustar el buscador de DataTables */
+.dataTables_filter {
+    flex: 1 1 auto; /* Permite que se ajuste al espacio disponible */
+    text-align: right; /* Alinea el buscador a la derecha */
+}
+
+/* Ajustar el selector de cantidad de entradas */
+.dataTables_length {
+    flex: 1 1 auto; /* Permite que se ajuste al espacio disponible */
+}
+
+/* Responsividad en pantallas pequeñas */
+@media (max-width: 768px) {
+    .dataTables_wrapper .row:first-child {
+        flex-direction: column; /* Coloca los elementos en una columna */
+        align-items: flex-start; /* Alinea los elementos al inicio */
+        gap: 15px; /* Reduce el espacio entre elementos */
+    }
+
+    .dataTables_filter, .dataTables_length {
+        text-align: left; /* Ajusta la alineación para pantallas pequeñas */
+    }
+}
+

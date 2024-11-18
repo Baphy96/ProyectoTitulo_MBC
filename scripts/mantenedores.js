@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Verificar si DataTable está inicializado
             if (!$.fn.DataTable.isDataTable('#entityTable')) {
-                $('#entityTable').DataTable({
+                $('#entityTable').DataTable({                    
                     language: {
                         emptyTable: "No hay datos disponibles en la tabla",
                         lengthMenu: "Mostrar _MENU_ entradas",
@@ -279,9 +279,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             last: "Último",
                             next: "Siguiente",
                             previous: "Anterior"
-                        }
                     }
-                });
+                },
+                columnDefs: [
+                    { targets: "_all", className: "dt-center" },
+                    { targets: -1, orderable: false }, // Deshabilita la ordenación en la última columna (botón)
+                ],
+                order: [[0, 'asc']], // Ordenar por la primera columna por defecto
+                responsive: true,    // Hacer que la tabla sea responsive
+                autoWidth: false      // Evitar anchos fijos para mejor adaptación
+            });
             } else {
                 // Si ya está inicializado, solo redibujar la tabla
                 $('#entityTable').DataTable().draw();
@@ -485,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Verificar si DataTable está inicializado
             if (!$.fn.DataTable.isDataTable('#serviceTypeTable')) {
-                $('#serviceTypeTable').DataTable({
+                $('#serviceTypeTable').DataTable({            
                     language: {
                         emptyTable: "No hay datos disponibles en la tabla",
                         lengthMenu: "Mostrar _MENU_ entradas",
@@ -496,9 +503,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             last: "Último",
                             next: "Siguiente",
                             previous: "Anterior"
-                        }
                     }
-                });
+                },
+                columnDefs: [
+                    { targets: "_all", className: "dt-center" },
+                    { targets: -1, orderable: false }, // Deshabilita la ordenación en la última columna (botón)
+                ],
+                order: [[0, 'asc']], // Ordenar por la primera columna por defecto
+                responsive: true,    // Hacer que la tabla sea responsive
+                autoWidth: false      // Evitar anchos fijos para mejor adaptación
+            });
             } else {
                 // Si ya está inicializado, solo redibujar la tabla
                 $('#serviceTypeTable').DataTable().draw();
@@ -650,9 +664,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             last: "Último",
                             next: "Siguiente",
                             previous: "Anterior"
-                        }
                     }
-                });
+                },
+                columnDefs: [
+                    { targets: "_all", className: "dt-center" },
+                    { targets: -1, orderable: false }, // Deshabilita la ordenación en la última columna (botón)
+                ],
+                order: [[0, 'asc']], // Ordenar por la primera columna por defecto
+                responsive: true,    // Hacer que la tabla sea responsive
+                autoWidth: false      // Evitar anchos fijos para mejor adaptación
+            });
             } else {
                 // Si ya está inicializado, solo redibujar la tabla
                 $('#courtTable').DataTable().draw();
@@ -803,9 +824,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             last: "Último",
                             next: "Siguiente",
                             previous: "Anterior"
-                        }
                     }
-                });
+                },
+                columnDefs: [
+                    { targets: "_all", className: "dt-center" },
+                    { targets: -1, orderable: false }, // Deshabilita la ordenación en la última columna (botón)
+                ],
+                order: [[0, 'asc']], // Ordenar por la primera columna por defecto
+                responsive: true,    // Hacer que la tabla sea responsive
+                autoWidth: false      // Evitar anchos fijos para mejor adaptación
+            });
             } else {
                 // Si ya está inicializado, solo redibujar la tabla
                 $('#stateTable').DataTable().draw();

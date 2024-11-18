@@ -1,0 +1,197 @@
+
+/* Estilos generales de la página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;    
+}
+
+/* Contenedor principal */
+.container-fluid {
+    padding: 0 15px;
+    margin-left: 250px; /* Asegura espacio para la barra lateral */
+    width: calc(100% - 250px); /* Ocupa el espacio restante */   
+        
+}
+
+/* Encabezado */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px 20px; /* Reducir el padding para ahorrar espacio */
+    text-align: center;
+    width: 100%; /* Reducir el ancho horizontal */
+    }
+
+
+/* Sección de filtros */
+.filter-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background-color: #ecf0f1;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.filter-section .form-group {
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+    padding: 0 10px;
+}
+
+.filter-section input,
+.filter-section select {
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.filter-section button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-section button:hover {
+    background-color: #218838;
+}
+
+#buscar {
+    padding: 8px 12px;
+    font-size: 0.9rem;    
+    margin-top: 30px; /* Asegura que no haya margen extra que desplace el botón */
+}
+
+
+/* Estilo de la Tabla */
+table {
+    width: 100%; /* Hacer la tabla tan amplia como el contenedor */
+    max-width: 1800px; /* Limitar el ancho máximo */
+    border-collapse: collapse;
+    margin: 10px auto; /* Centrar la tabla */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem; /* Tamaño de fuente similar a la tabla de causas */    
+}
+
+/* Encabezados */
+th {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+    padding: 10px; /* Ajustar padding para mayor consistencia */
+}
+
+/* Celdas */
+td {
+    padding: 10px; /* Igualar padding de celdas */
+    text-align: center; 
+    
+}
+
+/* Alternar colores de filas */
+tbody tr:nth-child(odd) {
+    background-color: #f7f7f7;
+}
+
+tbody tr:hover {
+    background-color: #eaeaea;
+}
+
+
+
+/* Tabla de Resultados */
+.table-responsive {    
+    width: 100%; /* Asegura que la tabla se expanda en todo el contenedor */
+    overflow-x: visible; /* Para que la tabla no tenga barra de desplazamiento horizontal */
+    
+}
+
+/* Estilos generales para la tabla */
+.table-responsive td, .table-responsive th {
+    font-size: 0.9em; /* Tamaño de letra estándar */
+    padding: 8px 10px; /* Añadir padding para una mejor separación entre celdas */
+    text-align: left; /* Alineación del texto a la izquierda para mejor legibilidad */
+}
+
+/* Ajuste del ancho máximo de las celdas para pantallas grandes */
+@media (min-width: 1200px) {
+    .table-responsive th, .table-responsive td {
+        padding: 5px; /* Dar más espacio a las celdas en pantallas grandes */
+    }
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+    .table-responsive td, .table-responsive th {
+        font-size: 0.8em; /* Reducir el tamaño de letra en pantallas pequeñas */
+        padding: 6px 8px; /* Reducir el padding para hacer la tabla más compacta */
+    }
+
+    .table-responsive {
+        overflow-x: auto; /* Añadir desplazamiento horizontal en pantallas pequeñas */
+    }   
+}
+
+
+
+/* Ajuste para pantallas más grandes */
+@media (min-width: 1200px) {
+    .content {
+        max-width: 1600px; /* Más ancho para pantallas muy grandes */
+        padding: 30px; /* Añadir un poco más de espacio alrededor */
+    }
+}
+
+/* Ajuste del margen izquierdo del contenido para pantallas más pequeñas */
+@media (max-width: 768px) {
+    .content {
+        margin-left: 250px; /* Elimina el margen izquierdo en pantallas pequeñas */
+        padding: 10px; /* Reduce el padding para optimizar espacio */
+    }
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .content {
+        margin-left: 0; /* Elimina el margen izquierdo en pantallas pequeñas */
+        width: 100%; /* Usa todo el ancho */
+        padding: 10px; /* Espaciado compacto */
+        
+    }
+
+    .table-responsive {
+        overflow-x: auto; /* Habilitar scroll horizontal si es necesario */
+    }
+
+    table {
+        font-size: 0.85rem; /* Reducir tamaño de fuente */
+    }
+
+    th, td {
+        padding: 8px; /* Reducir padding */
+    }
+}
+
+/* Ajustes para pantallas grandes */
+@media (min-width: 1200px) {
+    .content {
+        max-width: calc(100% - 250px); /* Asegura que el contenido no se desborde */
+        padding: 30px; /* Añadir espacio adicional */
+        
+    }
+
+    table {
+        max-width: 100%; /* Evitar restricciones de ancho */
+    }
+}
+

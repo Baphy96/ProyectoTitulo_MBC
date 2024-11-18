@@ -1,96 +1,199 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Honorarios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="../css/menu.css"> 
-    <link rel="stylesheet" href="../css/gestionCausas.css"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/honorarios.css">
 </head>
-<body>
-    <!-- Barra lateral -->
-    <div id="sidebar-container"></div>
 
-        <!-- Contenido principal -->
-        <div class="main-content">
-            <header>
-                <h1>Gestión de Honorarios</h1>
-            </header>
-            <main>
-                <section class="filter-section">
-                    <form id="searchForm">
-                        <div class="form-group">
-                            <label for="periodoDesde">Periodo Desde:</label>
-                            <input type="date" id="periodoDesde" name="periodoDesde">
-                        </div>
-                        <div class="form-group">
-                            <label for="periodoHasta">Periodo Hasta:</label>
-                            <input type="date" id="periodoHasta" name="periodoHasta">
-                        </div>
-                        <div class="form-group">
-                            <label for="rut">RUT Cliente:</label>
-                            <input type="text" id="rut" name="rut" placeholder="Ej: 12345678-9">
-                        </div>
-                        <button type="submit" id="buscar">Buscar</button>
-                        <button type="button" id="exportar">Exportar</button>
-                    </form>
-                </section>
+
+<body>
+    <!-- Contenedor de la barra lateral -->
+    <div id="sidebar-container"></div>
     
-                <section class="results-section">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>RUT Cliente</th>
-                                <th>Nombre Cliente</th>
-                                <th>ROL / Año</th>
-                                <th>Tipo de Documento</th>
-                                <th>N.º de Documento</th>
-                                <th>Fecha</th>
-                                <th>Monto</th>
-                                <th>Abono</th>
-                                <th>Saldo</th>
-                                <th>Pagar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                            <!-- Resultados se cargarán aquí -->
-                        </tbody>
-                    </table>
-                </section>
-            </main>
-    
-            <!-- Modal para pagos -->
-            <div id="paymentModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Realizar Pago / Abono</h2>
-                    <form id="paymentForm">
-                        <div class="form-group">
-                            <label for="rutClientePago">RUT Cliente:</label>
-                            <input type="text" id="rutClientePago" name="rutClientePago" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="nombreClientePago">Nombre Cliente:</label>
-                            <input type="text" id="nombreClientePago" name="nombreClientePago" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="montoPagar">Monto a Pagar / Abonar:</label>
-                            <input type="number" id="montoPagar" name="montoPagar" min="0" required>
-                        </div>
-                        <button type="submit" id="realizarPago">Realizar Pago</button>
-                    </form>
+    <!-- Contenido principal -->
+    <div class="container-fluid">
+        <header class="text-center">
+            <h1>Gestión de Honorarios</h1>
+        </header>
+        <main>
+            <!-- Sección de Filtros -->
+            <section class="filter-section">
+                <form id="searchForm" class="d-flex align-items-center justify-content-between flex-wrap">
+                    <!-- Filtro por Periodo Desde -->
+                    <div class="form-group mr-2">
+                        <label for="periodoDesde">Periodo Desde:</label>
+                        <input type="date" id="periodoDesde" name="periodoDesde" class="form-control">
+                    </div>
+
+                    <!-- Filtro por Periodo Hasta -->
+                    <div class="form-group mr-2">
+                        <label for="periodoHasta">Periodo Hasta:</label>
+                        <input type="date" id="periodoHasta" name="periodoHasta" class="form-control">
+                    </div>
+
+                    <!-- Filtro por Tipo -->
+                    <div class="form-group mr-2">
+                        <label for="tipo">Tipo:</label>
+                        <select id="tipo" name="tipo" class="form-control">
+                            <option value="todos">Todos</option>
+                            <option value="pendientes">Pendientes</option>
+                            <option value="pagadas">Pagadas</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Cliente -->
+                    <div class="form-group mr-2">
+                        <label for="cliente">Cliente:</label>
+                        <input type="text" id="cliente" name="cliente" class="form-control" placeholder="Nombre o RUT">
+                    </div>
+
+                    <!-- Botón Buscar -->
+                    <div>
+                        <button type="submit" id="buscar" class="btn btn-success">Buscar</button>
+                    </div>
+                </form>
+            </section>
+
+
+            <!-- Sección de Resultados -->
+            <div class="table-responsive">
+                <table id="honorariosTable" class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Rut de Cliente</th>
+                            <th>Nombre de Cliente</th>
+                            <th>ROL / Año</th>
+                            <th>Tipo Documento</th>
+                            <th>N.º de Documento</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Abono</th>
+                            <th>Saldo</th>
+                            <th>Pagar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Los honorarios se cargarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <div id="totalGeneralContainer" class="text-right mt-3">
+                    <!-- Se mostrará el total general aquí -->
                 </div>
             </div>
-        </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js"></script>
-    <script src="../scripts/honorarios.js"></script>
-    <script src="../scripts/sidebarLoader.js" defer></script>
+            <!-- Modal para pagos -->
+            <div id="paymentModal" class="modal fade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <span id="modalClienteRUT">RUT Cliente</span>
+                                <span id="modalClienteNombre">Nombre Cliente</span>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="paymentForm">
+                                <!-- Campos obligatorios -->
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="fechaPago">Fecha de Pago</label>
+                                        <input type="date" id="fechaPago" name="fechaPago" class="form-control"
+                                            required>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="tipoPago">Tipo de Pago</label>
+                                        <select id="tipoPago" name="tipoPago" class="form-control" required>
+                                            <option value="" disabled selected>Seleccionar</option>
+                                            <option value="transferencia">Transferencia</option>
+                                            <option value="cheque">Cheque</option>
+                                            <option value="efectivo">Efectivo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="numDocumentoPago">N.º Dcto. Pago</label>
+                                        <input type="text" id="numDocumentoPago" name="numDocumentoPago"
+                                            class="form-control">
+                                    </div>
+                                </div>
 
+                                <!-- Tabla de documentos -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>N.º de Documento</th>
+                                                <th>Saldo</th>
+                                                <th>Monto a Pagar</th>
+                                                <th>Pagar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="paymentTableBody">
+                                            <!-- Se llenará dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Total -->
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <h5>Total: <span id="totalPago" class="font-weight-bold">$0</span></h5>
+                                    <button type="submit" class="btn btn-primary">Pagar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal para editar pago -->
+            <div id="editPaymentModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Editar Pagos</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Fecha de Pago</th>
+                            <th>Tipo de Pago</th>
+                            <th>Monto</th>
+                            <th>N.° Documento</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody id="editPaymentTableBody"></tbody>
+                      </table>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" id="saveEditedPayments">Guardar Cambios</button>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+    <!-- Scripts de Firebase y funciones -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="module" src="../scripts/honorarios.js"></script>
+    <script src="../scripts/sidebar.js" defer></script>
 
 </body>
+
 </html>

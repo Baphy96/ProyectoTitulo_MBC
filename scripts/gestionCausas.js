@@ -3,6 +3,7 @@ import { db } from "../firebaseConfig.js";
 
 let honorariosTemporales = null; // Variable para almacenar los honorarios temporalmente
 
+
 document.addEventListener('DOMContentLoaded', function () {
     // Referencias a elementos del DOM
     const addCauseButton = document.getElementById('addCause');
@@ -15,6 +16,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const maintainerModal = document.getElementById('maintainerModal');
     const maintainerForm = document.getElementById('maintainerForm');
     const resultsTableBody = document.getElementById('resultsTableBody');
+    const searchForm = document.getElementById('searchForm');
+    const startDateInput = document.getElementById('startDate'); // Input para la fecha de inicio
+    const endDateInput = document.getElementById('endDate'); // Input para la fecha de fin
+    const buscarButton = document.getElementById('buscar'); // Botón de búsqueda
+    
+ // Función para manejar cambios en los filtros
+ function handleFilterChange() {
+    const startDate = startDateInput.value || null;
+    const endDate = endDateInput.value || null;
+
+    // Llamar a `loadCausas` con las fechas actualizadas
+    loadCausas(startDate, endDate);
+}
+
+// Asignar eventos a los filtros
+startDateInput.addEventListener('change', handleFilterChange);
+endDateInput.addEventListener('change', handleFilterChange);
+
+// Asignar evento al botón de búsqueda para ejecutar manualmente
+buscarButton.addEventListener('click', (event) => {
+    event.preventDefault(); // Prevenir comportamiento por defecto del formulario
+    const startDate = startDateInput.value || null;
+    const endDate = endDateInput.value || null;
+
+    // Llamar a `loadCausas` con las fechas actualizadas
+    loadCausas(startDate, endDate);
+});
+
+
 
     // Evento para formatear el monto con separador de miles mientras se escribe
     document.getElementById('montoHonorarios').addEventListener('input', function (event) {
@@ -23,11 +53,26 @@ document.addEventListener('DOMContentLoaded', function () {
         input.value = formatNumberWithThousandSeparator(value);
     });
 
+
+
+
+    // Asigna eventos de clic para cerrar cada modal de forma independiente
+    document.querySelector('.close-causa').addEventListener('click', function () {
+        $('#addCauseModal').modal('hide');
+    });
+
+    document.querySelector('.close-cliente').addEventListener('click', function () {
+        $('#maintainerModal').modal('hide');
+    });
+
+    document.querySelector('.close-honorarios').addEventListener('click', function () {
+        $('#honorariosModal').modal('hide');
+    });
+
     // Inicialización de Eventos
     addCauseButton.addEventListener('click', openAddCauseModal);
-    closeModalButtons.forEach(button => button.addEventListener('click', closeModals));
     window.addEventListener('click', closeModalOutside);
-    newCauseForm.addEventListener('submit', saveCause);
+    // newCauseForm.addEventListener('submit', saveCause);
     honorariosButton.addEventListener('click', openHonorariosModal);
     honorariosForm.addEventListener('submit', submitHonorarios);
 
@@ -35,22 +80,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function openAddCauseModal() {
         newCauseForm.reset();
         newCauseForm.removeAttribute('data-id');
-        addCauseModal.style.display = 'block';
-        document.querySelector("#addCauseModal h2").innerText = "Agregar Nueva Causa";
+
+        // Cambia el título del modal
+        document.querySelector("#addCauseModal .modal-title").innerText = "Agregar Nueva Causa";
+
+        // Muestra el modal utilizando Bootstrap
+        $('#addCauseModal').modal('show');
+
         loadDropdownOptions();
     }
 
-    function closeModals() {
-        addCauseModal.style.display = 'none';
-        honorariosModal.style.display = 'none';
-        maintainerModal.style.display = 'none';
-        newCauseForm.reset();
-        newCauseForm.removeAttribute('data-id');
-    }
-
     function closeModalOutside(event) {
-        if (event.target === addCauseModal) addCauseModal.style.display = 'none';
-        if (event.target === honorariosModal) honorariosModal.style.display = 'none';
+        if (event.target === addCauseModal) $('#addCauseModal').modal('hide');
+        if (event.target === honorariosModal) $('#honorariosModal').modal('hide');
+        if (event.target === maintainerModal) $('#maintainerModal').modal('hide');
     }
 
     // Manejar clic en botones para agregar cliente desde "Agregar Nueva Causa"
@@ -81,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert("Entidad agregada con éxito.");
 
                     // Cerrar el modal y resetear el formulario
-                    document.getElementById('maintainerModal').style.display = 'none';
+                    $('#maintainerModal').modal('hide');
 
                     // Añadir el nuevo cliente a la lista desplegable en "Agregar Nueva Causa"
                     const clienteSelect = document.getElementById('cliente');
@@ -101,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         clienteSelect.selectedIndex = 1;
                     }
                     // Volver a mostrar el modal de "Agregar Nueva Causa"
-                    document.getElementById('addCauseModal').style.display = 'block';
+                    $('#addCauseModal').modal('show');
                 } catch (e) {
                     console.error("Error al agregar el cliente: ", e);
                 }
@@ -141,13 +184,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Manejar clic en el botón de cierre ("X") del modal "Agregar Nuevo Cliente"
     document.querySelectorAll('#maintainerModal .close').forEach(button => {
         button.addEventListener('click', () => {
-            const maintainerModal = document.getElementById('maintainerModal');
-            if (maintainerModal && maintainerModal.style.display === 'block') {
-                maintainerModal.style.display = 'none';
+            // Cierra el modal "Agregar Nuevo Cliente" utilizando Bootstrap
+            $('#maintainerModal').modal('hide');
 
-                // Mostrar nuevamente el modal "Agregar Nueva Causa"
-                document.getElementById('addCauseModal').style.display = 'block';
-            }
+            // Mostrar nuevamente el modal "Agregar Nueva Causa"
+            $('#addCauseModal').modal('show');
         });
     });
 
@@ -155,11 +196,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function showModal(title, content, submitCallback) {
         const modal = document.getElementById('maintainerModal');
         const modalContent = modal.querySelector('.modal-content');
-        modal.querySelector('h2').innerText = title;
+        modal.querySelector('h5').innerText = title;
         modalContent.querySelector('form').innerHTML = content;
 
         // Mostrar el modal
-        modal.style.display = 'block';
+        $('#maintainerModal').modal('show');
 
         // Añadir evento submit al formulario
         const form = modalContent.querySelector('form');
@@ -318,6 +359,160 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Función para editar una causa existente
+    window.editarCausa = async function (id) {
+        try {
+            // Limpiar el formulario antes de cargar nuevos datos
+            newCauseForm.reset();
+            honorariosForm.reset();
+            honorariosForm.removeAttribute('data-honorario-id');
+            newCauseForm.removeAttribute('data-cause-id');
+
+            // Obtener el documento de la causa para extraer los datos
+            const docRef = doc(db, "causas", id);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const causa = docSnap.data();
+
+                // Abrir el modal para edición y cambiar el título
+                openAddCauseModal();
+
+                // Asigna el ID de la causa al formulario para indicar que estamos en modo edición
+                newCauseForm.setAttribute('data-cause-id', id);
+
+                // Cargar opciones de listas desplegables antes de establecer valores
+                await loadDropdownOptions();
+                document.querySelector("#addCauseModal h5").innerText = `Editar Causa Rol ${causa.rol}`;
+
+                // Asignar valores de la causa a los campos del formulario
+                document.getElementById('cliente').value = causa.rut || "";
+                document.getElementById('rolCausa').value = causa.rol || "";
+                document.getElementById('fechaIngreso').value = causa.fechaIngreso || "";
+                document.getElementById('tribunal').value = causa.tribunal || "";
+                document.getElementById('abogadoResponsable').value = causa.abogadoResponsable || "";
+                document.getElementById('estado').value = causa.estado || "";
+                document.getElementById('tipoServicio').value = causa.tipoServicio || "";
+                document.getElementById('receptorJudicial').value = causa.receptorJudicial || "";
+                document.getElementById('abogadoCoordinador').value = causa.abogadoCoordinador || "";
+                document.getElementById('demandado').value = causa.demandado || "";
+
+                // Asignar valores a asistentes legales como checkboxes
+                Array.from(document.querySelectorAll('input[name="asistentesLegales"]')).forEach(checkbox => {
+                    checkbox.checked = causa.asistentesLegales && causa.asistentesLegales.includes(checkbox.value);
+                });
+
+                // Cargar y asignar datos de los honorarios si existen
+                const honorariosSnapshot = await getDocs(query(collection(db, "honorarios"), where("rol", "==", causa.rol)));
+                if (!honorariosSnapshot.empty) {
+                    const honorariosData = honorariosSnapshot.docs[0].data();
+                    const honorariosId = honorariosSnapshot.docs[0].id;
+
+                    // Asignar valores al formulario de honorarios
+                    document.getElementById('rolHonorarios').value = honorariosData.rol || "";
+                    document.getElementById('tipoDocumento').value = honorariosData.tipoDocumento || "";
+                    document.getElementById('numeroDocumento').value = honorariosData.numeroDocumento || "";
+                    document.getElementById('fechaDocumento').value = honorariosData.fechaDocumento || "";
+                    document.getElementById('montoHonorarios').value = honorariosData.monto || "";
+
+                    // Guardar el ID de honorarios en el formulario para actualizarlo después
+                    honorariosForm.setAttribute('data-honorario-id', honorariosId);
+                }
+            } else {
+                console.log("No se encontró la causa con el ID proporcionado.");
+                alert("La causa no se encontró. Por favor, verifique si aún existe.");
+            }
+        } catch (e) {
+            console.error("Error obteniendo causa para editar:", e);
+            alert("Hubo un error al obtener los datos de la causa. Por favor, intente de nuevo.");
+        }
+    };
+
+    // Función para guardar los cambios de la edición
+    // Función para guardar los cambios de la edición o agregar una nueva causa
+    newCauseForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        // Obtener el ID del documento a editar desde el atributo `data-cause-id`
+        const id = newCauseForm.getAttribute('data-cause-id');  // Verifica si es una edición
+        const rutCliente = document.getElementById('cliente').value;
+        const rolCausa = document.getElementById('rolCausa').value;
+        // Verifica si hay alguna opción seleccionada y asigna el nombre correspondiente
+        const nombreCliente = document.getElementById('cliente').selectedOptions.length > 0
+            ? document.getElementById('cliente').selectedOptions[0].text
+            : "";
+
+        if (!rutCliente || !rolCausa) {
+            alert("Por favor complete todos los campos obligatorios.");
+            return;
+        }
+
+        // Capturar datos del formulario de la causa
+        const updatedCause = {
+            rut: rutCliente,
+            rol: rolCausa,
+            nombre: nombreCliente,  // Asegúrate de asignar el nombre del cliente aquí
+            fechaIngreso: document.getElementById('fechaIngreso').value,
+            tribunal: document.getElementById('tribunal').value,
+            abogadoResponsable: document.getElementById('abogadoResponsable').value,
+            estado: document.getElementById('estado').value,
+            tipoServicio: document.getElementById('tipoServicio').value,
+            receptorJudicial: document.getElementById('receptorJudicial').value,
+            abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
+            demandado: document.getElementById('demandado').value,
+            asistentesLegales: Array.from(document.querySelectorAll('input[name="asistentesLegales"]:checked')).map(checkbox => checkbox.value)
+        };
+
+        try {
+            if (id) {
+                // Actualizar la causa existente si hay un ID
+                const causeRef = doc(db, "causas", id);
+                await updateDoc(causeRef, updatedCause);
+                alert("Causa actualizada con éxito.");
+            } else {
+                // Si no hay ID, agregar una nueva causa
+                await addDoc(collection(db, "causas"), updatedCause);
+                alert("Causa agregada con éxito.");
+            }
+
+            // Manejar los honorarios temporales si existen
+            if (honorariosTemporales) {
+                honorariosTemporales.rol = updatedCause.rol;
+                honorariosTemporales.rutCliente = updatedCause.rut; // Asegúrate de usar el RUT del cliente de la causa
+                honorariosTemporales.nombreCliente = updatedCause.nombre; // Asegúrate de usar el nombre del cliente de la causa
+
+
+                const honorariosRef = collection(db, "honorarios");
+                const querySnapshot = await getDocs(query(honorariosRef, where("rol", "==", honorariosTemporales.rol)));
+
+                if (!querySnapshot.empty) {
+                    // Actualizar los honorarios existentes
+                    const honorarioDoc = querySnapshot.docs[0];
+                    await updateDoc(honorarioDoc.ref, honorariosTemporales);
+                } else {
+                    // Agregar nuevos honorarios
+                    await addDoc(honorariosRef, honorariosTemporales);
+                }
+                honorariosTemporales = null; // Limpiar la variable después de guardar
+            }
+
+            // Cerrar el modal y limpiar el formulario
+            newCauseForm.removeAttribute('data-cause-id');
+            $('#addCauseModal').modal('hide');
+            newCauseForm.reset();
+
+            // Recargar la tabla de causas para mostrar los cambios
+            loadCausas();
+        } catch (e) {
+            console.error("Error al actualizar la causa y/o honorarios:", e);
+            alert("Hubo un error al actualizar la causa y/o honorarios. Por favor, intente de nuevo.");
+        }
+    });
+
+
+
+
+
     async function saveCause(event) {
         event.preventDefault();
 
@@ -401,13 +596,25 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        honorariosModal.style.display = 'block';
+        $('#honorariosModal').modal('show');
         document.getElementById('nombreClienteHonorarios').value = document.getElementById('cliente').selectedOptions[0].text;
         document.getElementById('rolHonorarios').value = rolCausa;
+
+        // Muestra el modal utilizando Bootstrap
+        $('#honorariosModal').modal('show');
+
+        $('#honorariosModal').modal('hide');
     }
 
     function submitHonorarios(event) {
         event.preventDefault();
+
+        const clienteElement = document.getElementById('cliente');
+        const rutCliente = clienteElement.value;
+        const nombreCliente = clienteElement.options[clienteElement.selectedIndex]?.text || "";
+
+
+
 
         // Capturar los valores de los campos del formulario de honorarios
         honorariosTemporales = {
@@ -428,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function () {
         alert("Honorarios guardados temporalmente. Se guardarán junto con la causa.");
 
         // Cerrar el modal y limpiar el formulario de honorarios
-        honorariosModal.style.display = 'none';
+        $('#honorariosModal').modal('hide');
         honorariosForm.reset();
     }
 
@@ -443,50 +650,64 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Función para Cargar y Mostrar Causas
-    async function loadCausas() {
+    async function loadCausas(startDate = null, endDate = null) {
         try {
             // Verifica y destruye cualquier instancia previa de DataTable
             if ($.fn.DataTable.isDataTable('#causasTable')) {
-                $('#causasTable').DataTable().clear().destroy(); // Limpiar y destruir DataTable
-                $('#causasTable tbody').empty(); // Vaciar el contenido del tbody
+                $('#causasTable').DataTable().clear().destroy();
+                $('#causasTable tbody').empty();
             }
 
-            const causasSnapshot = await getDocs(collection(db, "causas"));
+            // Construir la consulta con los filtros aplicados
+            let causasQuery = collection(db, "causas");
 
-            const rows = []; // Array para almacenar las filas
+            if (startDate) {
+                causasQuery = query(causasQuery, where("fechaIngreso", ">=", startDate));
+            }
+            if (endDate) {
+                causasQuery = query(causasQuery, where("fechaIngreso", "<=", endDate));
+            }
+
+            const causasSnapshot = await getDocs(causasQuery);
+            const rows = [];
 
             for (const causaDoc of causasSnapshot.docs) {
                 const causaData = causaDoc.data();
-                let honorariosData = {};
+    
+                // Formatea la fecha en dd-mm-aa
+                const fecha = causaData.fechaIngreso
+                    ? new Date(causaData.fechaIngreso).toLocaleDateString("es-CL", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric", // Mostrar año completo (2024 en lugar de 24)
+                      })
+                    : "N/A";
 
-                // Buscar honorarios asociados a la causa actual
-                const honorariosSnapshot = await getDocs(query(collection(db, "honorarios"), where("rol", "==", causaData.rol)));
-                if (!honorariosSnapshot.empty) {
-                    honorariosData = honorariosSnapshot.docs[0].data();
-                }
-
-                // Mostrar valor de los honorarios en la columna correspondiente o mostrar 'Sin Honorarios'
+                // Obtener datos de honorarios asociados
+                const honorariosSnapshot = await getDocs(
+                    query(collection(db, "honorarios"), where("rol", "==", causaData.rol))
+                );
+                const honorariosData = honorariosSnapshot.empty ? {} : honorariosSnapshot.docs[0].data();
                 const honorariosValue = honorariosData.monto
                     ? `$${formatNumberWithThousandSeparator(honorariosData.monto)}`
-                    : 'Sin Honorarios';
+                    : "Sin Honorarios";
 
-                // Agregar la fila al array `rows`
                 rows.push([
-                    causaData.rut,
-                    causaData.nombre,
-                    causaData.rol,
-                    causaData.fechaIngreso,
-                    causaData.tribunal,
-                    causaData.abogadoResponsable,
-                    causaData.tipoServicio,
+                    causaData.rut || "N/A",
+                    causaData.nombre || "N/A",
+                    causaData.rol || "N/A",
+                    fecha,
+                    causaData.tribunal || "N/A",
+                    causaData.abogadoResponsable || "N/A",
+                    causaData.tipoServicio || "N/A",
                     honorariosValue,
-                    causaData.estado,
-                    `<button class="edit-button" data-id="${causaDoc.id}" onclick="editarCausa('${causaDoc.id}')">✏️</button>
-                     <button class="delete-button" data-id="${causaDoc.id}" onclick="eliminarCausa('${causaDoc.id}')">🗑️</button>`
+                    causaData.estado || "N/A",
+                    `<button class="edit-button" onclick="editarCausa('${causaDoc.id}')">✏️</button>
+                     <button class="delete-button" onclick="eliminarCausa('${causaDoc.id}')">🗑️</button>`,
                 ]);
             }
 
-            // Inicializar DataTable con las filas en `rows`
+            // Inicializar DataTable
             $('#causasTable').DataTable({
                 data: rows,
                 columns: [
@@ -499,172 +720,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     { title: "Tipo de Servicio" },
                     { title: "Honorarios" },
                     { title: "Estado" },
-                    { title: "Acciones" }
+                    { title: "Acciones" },
                 ],
-                destroy: true, // Permitir destrucción para reinicialización
+                destroy: true,
                 language: {
                     emptyTable: "No hay datos disponibles en la tabla",
                     lengthMenu: "Mostrar _MENU_ entradas",
-                    search: "Buscar:",
+                    search: "Busqueda avanzada:",
                     info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
                     paginate: {
                         first: "Primero",
                         last: "Último",
                         next: "Siguiente",
-                        previous: "Anterior"
-                    }
+                        previous: "Anterior",
+                    },
                 },
-                columnDefs: [
-                    { targets: '_all', className: 'dt-center' } // Centrar todas las columnas
-                ],
-                order: [[0, 'asc']], // Ordenar por la primera columna por defecto
-                responsive: true    // Hacer que la tabla sea responsive
+                columnDefs: [{ targets: "_all", className: "dt-center" }],
+                order: [[0, "asc"]],
+                responsive: true,
+                autoWidth: false,
             });
-        } catch (e) {
-            console.error("Error al cargar causas: ", e);
+        } catch (error) {
+            console.error("Error al cargar causas: ", error);
         }
     }
-
-    // Función para editar una causa existente
-    window.editarCausa = async function (id) {
-        try {
-            // Limpiar el formulario antes de cargar nuevos datos
-            newCauseForm.reset();
-            honorariosForm.reset();
-            honorariosForm.removeAttribute('data-honorario-id');
-            newCauseForm.removeAttribute('data-cause-id');
-
-            // Obtener el documento de la causa para extraer los datos
-            const docRef = doc(db, "causas", id);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const causa = docSnap.data();
-
-                // Abrir el modal para edición y cambiar el título
-                openAddCauseModal();
-
-                // Asigna el ID de la causa al formulario para indicar que estamos en modo edición
-                newCauseForm.setAttribute('data-cause-id', id);
-
-                // Cargar opciones de listas desplegables antes de establecer valores
-                await loadDropdownOptions();
-                document.querySelector("#addCauseModal h2").innerText = `Editar Causa Rol ${causa.rol}`;
-
-                // Asignar valores de la causa a los campos del formulario
-                document.getElementById('cliente').value = causa.rut || "";
-                document.getElementById('rolCausa').value = causa.rol || "";
-                document.getElementById('fechaIngreso').value = causa.fechaIngreso || "";
-                document.getElementById('tribunal').value = causa.tribunal || "";
-                document.getElementById('abogadoResponsable').value = causa.abogadoResponsable || "";
-                document.getElementById('estado').value = causa.estado || "";
-                document.getElementById('tipoServicio').value = causa.tipoServicio || "";
-                document.getElementById('receptorJudicial').value = causa.receptorJudicial || "";
-                document.getElementById('abogadoCoordinador').value = causa.abogadoCoordinador || "";
-                document.getElementById('demandado').value = causa.demandado || "";
-
-                // Asignar valores a asistentes legales como checkboxes
-                Array.from(document.querySelectorAll('input[name="asistentesLegales"]')).forEach(checkbox => {
-                    checkbox.checked = causa.asistentesLegales && causa.asistentesLegales.includes(checkbox.value);
-                });
-
-                // Cargar y asignar datos de los honorarios si existen
-                const honorariosSnapshot = await getDocs(query(collection(db, "honorarios"), where("rol", "==", causa.rol)));
-                if (!honorariosSnapshot.empty) {
-                    const honorariosData = honorariosSnapshot.docs[0].data();
-                    const honorariosId = honorariosSnapshot.docs[0].id;
-
-                    // Asignar valores al formulario de honorarios
-                    document.getElementById('rolHonorarios').value = honorariosData.rol || "";
-                    document.getElementById('tipoDocumento').value = honorariosData.tipoDocumento || "";
-                    document.getElementById('numeroDocumento').value = honorariosData.numeroDocumento || "";
-                    document.getElementById('fechaDocumento').value = honorariosData.fechaDocumento || "";
-                    document.getElementById('montoHonorarios').value = honorariosData.monto || "";
-
-                    // Guardar el ID de honorarios en el formulario para actualizarlo después
-                    honorariosForm.setAttribute('data-honorario-id', honorariosId);
-                }
-            } else {
-                console.log("No se encontró la causa con el ID proporcionado.");
-                alert("La causa no se encontró. Por favor, verifique si aún existe.");
-            }
-        } catch (e) {
-            console.error("Error obteniendo causa para editar:", e);
-            alert("Hubo un error al obtener los datos de la causa. Por favor, intente de nuevo.");
-        }
-    };
-
-    // Función para guardar los cambios de la edición
-    newCauseForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        // Obtener el ID del documento a editar desde el atributo `data-cause-id`
-        const id = newCauseForm.getAttribute('data-cause-id');  // Verifica si es una edición
-        const rutCliente = document.getElementById('cliente').value;
-        const rolCausa = document.getElementById('rolCausa').value;
-        const nombrecliente = document.getElementById('cliente').selectedOptions[0].text;
-
-        if (!rutCliente || !rolCausa) {
-            alert("Por favor complete todos los campos obligatorios.");
-            return;
-        }
-        // Capturar datos del formulario de la causa
-        const updatedCause = {
-            rut: document.getElementById('cliente').value,
-            rol: document.getElementById('rolCausa').value,
-            fechaIngreso: document.getElementById('fechaIngreso').value,
-            tribunal: document.getElementById('tribunal').value,
-            abogadoResponsable: document.getElementById('abogadoResponsable').value,
-            estado: document.getElementById('estado').value,
-            tipoServicio: document.getElementById('tipoServicio').value,
-            receptorJudicial: document.getElementById('receptorJudicial').value,
-            abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
-            demandado: document.getElementById('demandado').value,
-            asistentesLegales: Array.from(document.querySelectorAll('input[name="asistentesLegales"]:checked')).map(checkbox => checkbox.value)
-        };
-
-        try {
-            // Actualizar el documento en Firestore utilizando el ID especificado
-            if (id) {
-                const causeRef = doc(db, "causas", id);
-                await updateDoc(causeRef, updatedCause);
-                alert("Causa actualizada con éxito.");
-            } else {
-                await addDoc(collection(db, "causas"), updatedCause);
-                alert("Causa agregada con éxito.");
-            }
-
-            // Si existen honorarios temporales, actualizar o agregar en la colección correspondiente
-            if (honorariosTemporales) {
-                honorariosTemporales.rol = updatedCause.rol;
-                const honorariosRef = collection(db, "honorarios");
-                const querySnapshot = await getDocs(query(honorariosRef, where("rol", "==", honorariosTemporales.rol)));
-
-                if (!querySnapshot.empty) {
-                    // Actualizar el documento existente de honorarios
-                    const honorarioDoc = querySnapshot.docs[0];
-                    await updateDoc(honorarioDoc.ref, honorariosTemporales);
-                } else {
-                    // Agregar nuevos honorarios si no existen
-                    await addDoc(honorariosRef, honorariosTemporales);
-                }
-                honorariosTemporales = null; // Limpiar la variable después de guardar
-            }
-
-            // Cerrar el modal y limpiar el formulario
-            newCauseForm.removeAttribute('data-cause-id');
-            addCauseModal.style.display = 'none';
-            newCauseForm.reset();
-
-
-            // Recargar la tabla de causas para mostrar los cambios
-            loadCausas();
-        } catch (e) {
-            console.error("Error al actualizar la causa y/o honorarios:", e);
-            alert("Hubo un error al actualizar la causa y/o honorarios. Por favor, inténtelo de nuevo.");
-        }
-    });
-
 
 
     // Función para eliminar una causa
@@ -709,4 +788,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Cargar causas al iniciar
     loadCausas();
+
+
+
+
 });

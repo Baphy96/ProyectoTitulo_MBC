@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Judicial</title>
+
+     <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/reportes.css">
+</head>
+
+<body>
+    <!-- Contenedor de la barra lateral -->
+    <div id="sidebar-container"></div>
+
+    <!-- Contenido principal -->
+    <div class="container-fluid">
+        <header class="text-center">
+            <h1>Reportes</h1>
+        </header>
+
+
+        <!-- Contenido principal de las pestañas -->
+        <main>
+            <!-- Navegación de pestañas -->
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="reportes">Reportes</button>
+                <button class="tab-button" data-tab="graficos">Gráficos</button>
+
+            </div>
+
+            <!-- Contenido de cada pestaña -->
+            <section id="reporte-tab-content" class="tab-content">
+                <h2>Reportes</h2>
+
+                <!-- Sección de Filtros -->
+                <div class="card mb-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <!-- Filtros de periodo y botón de consultar -->
+                        <div class="d-flex align-items-center">
+                            <div class="form-group mr-2">
+                                <label for="periodoDesde" class="d-block">Periodo Desde</label>
+                                <input type="date" id="periodoDesde" name="periodoDesde" class="form-control">
+                            </div>
+                            <div class="form-group mr-2">
+                                <label for="periodoHasta" class="d-block">Periodo Hasta</label>
+                                <input type="date" id="periodoHasta" name="periodoHasta" class="form-control">
+                            </div>
+                            <button type="button" id="buscar" class="btn btn-primary">Consultar</button>
+                        </div>                
+                        
+                        <!-- Lista desplegable múltiple y botón de filtrar -->
+                        <div class="d-flex align-items-center">
+                            <!-- Cuadro desplegable con las opciones dinámicas -->
+                            <div class="mr-2">
+                                <label for="campos-tabla">Campos a mostrar:</label>
+                                <select id="campos-tabla" multiple="multiple" class="form-control">
+                                    <!-- Opciones se generarán dinámicamente desde el script -->
+                                </select>
+                            </div>
+                            <button type="button" id="filtrar-btn" class="btn btn-success">Filtrar</button>
+                        </div>
+
+                        <!-- Botón de exportar -->
+                        <div class="ml-2">
+                            <button id="exportar-btn" class="btn btn-secondary">Exportar</button>
+                        </div>
+                
+                    </div>
+                </div>
+
+                <!-- Tabla de Reporte -->
+                <div class="table-responsive">
+                    <table id="reportesTable" class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Rut de Cliente</th>
+                                <th>Nombre de Cliente</th>
+                                <th>ROL / Año</th>
+                                <th>Tipo de Servicio</th>
+                                <th>Fecha de Ingreso</th>                                
+                                <th>Abogado Responsable</th>
+                                <th>Asistentes Legales</th>
+                                <th>Tribunal</th>                                
+                                <th>Demandado</th>
+                                <th>Receptor Judicial</th>
+                                <th>Abogado Coordinador</th>
+                                <th>Estado</th>
+                                <th>Tipo Documento</th>
+                                <th>N.º de Documento</th>
+                                <th>Fecha de Documento</th>
+                                <th>Monto</th>
+                                <th>Abono</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Resultados se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+      <!-- Scripts de Firebase y funciones -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+     <script type="module" src="../scripts/reportes.js"></script>
+     <script src="../scripts/sidebar.js" defer></script>
+
+</body>
+
+</html>
