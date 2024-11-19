@@ -45,13 +45,29 @@ header {
 
 .tab-button.active {
     background-color: #007bff;
-    color: white;
+    color: white;    
 }
 
 /* Estilo para scrollbar horizontal */
 .table-responsive {
     overflow-x: auto;
 }
+
+/* Estilos para el botón activo */
+.btn-report.active {
+    background-color: #77abf0; /* Cambiar el color de fondo */
+    color: white; /* Cambiar el color del texto */
+    border: 2px solid #a0c0e2; /* Borde más visible */
+    font-weight: bold; /* Texto más destacado */
+}
+
+#grafico-preview {
+    width: 50%; /* Reducir el ancho al 50% del tamaño original */
+    height: auto; /* Mantener la proporción */
+    margin: 0 auto; /* Centrar el gráfico */
+    display: block;
+}
+
 
 /* Ajuste de la tabla en pantallas pequeñas */
 .table {
@@ -70,3 +86,4 @@ header {
 select[multiple] {
     height: auto; /* Ajustar altura del selector múltiple */
 }
+
