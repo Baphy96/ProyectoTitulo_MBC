@@ -1,5 +1,10 @@
 import { db } from "../firebaseConfig.js";
 import { collection, getDocs, getDoc, doc, updateDoc, arrayUnion, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+import { checkUserRole } from './roleManager.js'; 
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Verificar el rol del usuario y manejar los módulos visibles
+  checkUserRole();
 
 document.addEventListener("DOMContentLoaded", function () {
     const resultsTableBody = document.getElementById("resultsTableBody");
@@ -613,4 +618,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cargar honorarios al cargar la página
     loadHonorarios();
+});
 });

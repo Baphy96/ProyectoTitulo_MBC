@@ -1,8 +1,12 @@
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, getDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { db } from "../firebaseConfig.js";
+import { checkUserRole } from './roleManager.js'; 
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Verificar el rol del usuario y manejar los módulos visibles
+  checkUserRole();
 
 let honorariosTemporales = null; // Variable para almacenar los honorarios temporalmente
-
 
 document.addEventListener('DOMContentLoaded', function () {
     // Referencias a elementos del DOM
@@ -846,7 +850,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cargar causas al iniciar
     loadCausas();
 
-
-
+});
 
 });

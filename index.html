@@ -1,61 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión Judicial - Iniciar Sesión</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/inicioSesion.css">
-    <!-- reCAPTCHA será renderizado dinámicamente por Firebase -->
+    <link rel="stylesheet" href="./css/inicioSesion.css">
 </head>
-
 <body>
     <div class="container mt-5">
         <h2 class="text-center mb-4">Iniciar Sesión</h2>
         <div id="auth-message" class="auth-message text-center mb-4 text-danger"></div>
-
-        <!-- Formulario de Inicio de Sesión -->
+    
+        <!-- Formulario de inicio de sesión -->
         <form id="login-form" class="form">
             <div class="form-group">
+                <label for="login-email">Correo Electrónico</label>
                 <input type="email" id="login-email" class="form-control" placeholder="Correo electrónico" required>
             </div>
             <div class="form-group">
+                <label for="login-password">Contraseña</label>
                 <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
-            <p class="text-center mt-3"><a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a></p>
         </form>
-
-        <!-- Contenedor para reCAPTCHA -->
-        <div id="recaptcha-container" class="my-3"></div>
-
-        <!-- Sección de Autenticación de Dos Factores (2FA) -->
-        <div id="phone-section" class="mt-4" style="display:none;">
-            <h3 class="text-center">Autenticación de Dos Factores</h3>
-            <div class="form-group">
-                <input type="tel" id="phone-number" class="form-control" placeholder="Número de teléfono (+569XXXXXXXX)" required>
-            </div>
-            <button type="button" id="request-code" class="btn btn-secondary btn-block">Solicitar Código</button>
-        </div>
-
-        <!-- Sección para ingresar el código de verificación -->
-        <div id="verification-section" class="mt-4" style="display:none;">
-            <h3 class="text-center">Verificar Código</h3>
-            <div class="form-group">
-                <input type="text" id="verification-code" class="form-control" placeholder="Código de verificación" required>
-            </div>
-            <button type="button" id="verify-code" class="btn btn-success btn-block">Verificar Código</button>
-        </div>
     </div>
 
     <!-- Scripts -->
-    <!-- Firebase SDK -->
+    <script type="module" src="./scripts/roleManager.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
-    <!-- Tu script personalizado -->
-    <script type="module" src="../scripts/inicioSesion.js"></script>
-    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LdjDY4qAAAAAPyTSMSMQsQ5R_Q0S0iTy1RDIQEz"></script>
+    <script type="module" src="./scripts/inicioSesion.js"></script>
 </body>
-
 </html>
+
+
+

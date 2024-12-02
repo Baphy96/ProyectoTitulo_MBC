@@ -1,5 +1,10 @@
 import { db } from "../firebaseConfig.js"; // Importar Firestore configurado
 import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+import { checkUserRole } from './roleManager.js'; 
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Verificar el rol del usuario y manejar los módulos visibles
+  checkUserRole();
 
 // Referencias a las colecciones
 const eventsCollection = collection(db, "eventos");
@@ -538,6 +543,5 @@ document.getElementById("deleteEventButton").addEventListener("click", async () 
   await deleteEvent(eventId); // Llamar a la función de eliminación
   $("#editEventModal").modal("hide"); // Cerrar el modal
 });
-
-
+});
 

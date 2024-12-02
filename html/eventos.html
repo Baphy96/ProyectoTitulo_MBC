@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet"> <!-- FullCalendar -->
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/eventos.css">
 </head>
@@ -29,7 +29,6 @@
         <!-- Botones para agregar y editar eventos -->
         <div class="d-flex justify-content-center my-3">
             <button class="btn btn-primary mr-2" id="addEventButton">Agregar Evento</button>
-
         </div>
 
         <!-- Contenedor para notificaciones emergentes -->
@@ -60,8 +59,7 @@
                             <label for="filterEndDate">Hasta:</label>
                             <input type="date" id="filterEndDate" class="form-control">
                         </div>
-                        <button type="button" id="applyFilterButton"
-                            class="btn btn-primary btn-block mt-2">Filtrar</button>
+                        <button type="button" id="applyFilterButton" class="btn btn-primary btn-block mt-2">Filtrar</button>
                     </form>
                 </div>
 
@@ -78,108 +76,111 @@
                         <!-- Aquí se llenarán los eventos dinámicamente -->
                     </tbody>
                 </table>
-                
-            <!-- Modal para agregar evento -->
-            <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addEventModalLabel">Agregar Evento</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="addEventForm">
-                                <div class="form-group">
-                                    <label for="eventDate">Fecha</label>
-                                    <input type="date" class="form-control" id="eventDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="eventType">Tipo de evento</label>
-                                    <select class="form-control" id="eventType" required>
-                                        <option value="" disabled selected>Seleccione</option>
-                                        <option value="audiencia">Fecha de Audiencia</option>
-                                        <option value="reunion">Reunión</option>
-                                        <option value="plazo">Vencimiento de Plazo</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="eventRole">ROL / Año</label>
-                                    <select class="form-control" id="eventRole" required>
-                                        <option value="" disabled selected>Seleccione</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="eventDescription">Descripción</label>
-                                    <textarea class="form-control" id="eventDescription" rows="3"
-                                        placeholder="Detalles del evento"></textarea>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary" id="saveEventButton">Guardar</button>
-                        </div>
+            </div>
+        </div>
+
+        <!-- Modals for adding and editing events -->
+        <!-- Modal para agregar evento -->
+        <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEventModalLabel">Agregar Evento</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addEventForm">
+                            <div class="form-group">
+                                <label for="eventDate">Fecha</label>
+                                <input type="date" class="form-control" id="eventDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventType">Tipo de evento</label>
+                                <select class="form-control" id="eventType" required>
+                                    <option value="" disabled selected>Seleccione</option>
+                                    <option value="audiencia">Fecha de Audiencia</option>
+                                    <option value="reunion">Reunión</option>
+                                    <option value="plazo">Vencimiento de Plazo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventRole">ROL / Año</label>
+                                <select class="form-control" id="eventRole" required>
+                                    <option value="" disabled selected>Seleccione</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventDescription">Descripción</label>
+                                <textarea class="form-control" id="eventDescription" rows="3" placeholder="Detalles del evento"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="saveEventButton">Guardar</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Modal para editar evento -->
-            <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog"
-                aria-labelledby="editEventModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="editEventForm">
-                                <input type="hidden" id="editEventId"> <!-- Campo oculto para el ID del evento -->
-                                <div class="form-group">
-                                    <label for="editEventDate">Fecha</label>
-                                    <input type="date" class="form-control" id="editEventDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="editEventType">Tipo de evento</label>
-                                    <select class="form-control" id="editEventType" required>
-                                        <option value="Audiencia">Fecha de Audiencia</option>
-                                        <option value="Reunion">Reunión</option>
-                                        <option value="Plazo">Vencimiento de Plazo</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="editEventRole">ROL / Año</label>
-                                    <input type="text" class="form-control" id="editEventRole" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="editEventDescription">Descripción</label>
-                                    <textarea class="form-control" id="editEventDescription" rows="3"></textarea>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" id="deleteEventButton">Eliminar</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary" id="updateEventButton">Actualizar</button>
-                        </div>
+        <!-- Modal para editar evento -->
+        <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog"
+            aria-labelledby="editEventModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editEventForm">
+                            <input type="hidden" id="editEventId">
+                            <div class="form-group">
+                                <label for="editEventDate">Fecha</label>
+                                <input type="date" class="form-control" id="editEventDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEventType">Tipo de evento</label>
+                                <select class="form-control" id="editEventType" required>
+                                    <option value="Audiencia">Fecha de Audiencia</option>
+                                    <option value="Reunion">Reunión</option>
+                                    <option value="Plazo">Vencimiento de Plazo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEventRole">ROL / Año</label>
+                                <input type="text" class="form-control" id="editEventRole" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEventDescription">Descripción</label>
+                                <textarea class="form-control" id="editEventDescription" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="deleteEventButton">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="updateEventButton">Actualizar</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Scripts -->
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/index.global.min.js"></script>
-            <script src="../scripts/sidebar.js" defer></script>
-            <script src="../scripts/eventos.js" type="module"></script>
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script> <!-- FullCalendar -->
+        <script src="../scripts/roleManager.js" type="module" defer></script>
+        <script src="../scripts/sidebar.js" defer></script>
+        <script src="../scripts/eventos.js" type="module"></script>
 
 </body>
 

@@ -1,5 +1,10 @@
 import { db } from "../firebaseConfig.js"; // Importar Firestore configurado
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"; // Importar funciones necesarias
+import { checkUserRole } from './roleManager.js'; 
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Verificar el rol del usuario y manejar los módulos visibles
+  checkUserRole();
 
 // Lógica para alternar pestañas
 document.addEventListener("DOMContentLoaded", () => {
@@ -974,6 +979,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await cargarAbogados();
     await cargarEstados();
 });
-
+});
 
 

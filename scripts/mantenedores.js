@@ -1,7 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { app, auth, db } from "../firebaseConfig.js";
+import { checkUserRole } from './roleManager.js'; 
 
+document.addEventListener('DOMContentLoaded', function () {
+  // Verificar el rol del usuario y manejar los módulos visibles
+  checkUserRole();
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -910,6 +914,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
-
+});
 
 
