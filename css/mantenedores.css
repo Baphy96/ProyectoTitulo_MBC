@@ -1,28 +1,28 @@
 /* Estilos generales de la página */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
+    background-color: #f5f5f5;    
 }
 
 /* Contenedor principal */
-.main-content {
-    margin-left: 220px; /* Espacio equivalente al ancho de la barra lateral */
-    padding: 20px; /* Espacio interno */
-    width: 100vw; /* Ocupa el 100% del ancho de la ventana */
-    height: calc(100vh - 60px); /* Ocupa el 100% de la altura visible, menos el espacio reservado para un header u otros elementos */
-    box-sizing: border-box; /* Incluye padding y bordes en las dimensiones */    
-    overflow: auto; /* Permite scroll si el contenido es mayor que el contenedor */
+.container-fluid {
+    padding: 0 15px;
+    margin-left: 250px; /*  espacio para la barra lateral */
+    width: calc(100% - 250px); /* Ocupa el espacio restante */   
+    transition: margin-left 0.3s ease, width 0.3s ease;
+        
 }
 
-/* Estilos de encabezado principal */
-.main-content header {
+/* Encabezado */
+header {
     background-color: #2c3e50;
     color: white;
-    padding: 15px;
+    padding: 15px 20px; /* Reducir el padding para ahorrar espacio */
     text-align: center;
+    width: 100%; /* Reducir el ancho horizontal */
     margin-bottom: 20px;
-}
+    }
+
 
 /* Navegación de pestañas */
 .tabs {
@@ -126,20 +126,18 @@ body {
 
 /* Estilos de tablas */
 table {
-    width: 100%;
+    width: 100%; /* Hacer la tabla tan amplia como el contenedor */
     border-collapse: collapse;
-    margin-top: 10px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);     
-
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem; /* Tamaño de fuente similar a la tabla de causas */ 
+      
 }
 
 th, td {
     padding: 12px;
     border: 1px solid #bdc3c7;
     text-align: center;
-    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-    text-overflow: ellipsis; /* Agrega "..." si el texto es muy largo */
-    overflow: hidden; /* Oculta el texto que exceda el ancho */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */  
 }
 
 th {
@@ -149,6 +147,13 @@ th {
 
 td {
     background-color: #fefefe;
+    
+}
+
+/* Tabla de Resultados */
+.table-responsive {    
+    width: 100%; /* Asegura que la tabla se expanda en todo el contenedor */
+    overflow-x: auto; /* Para que la tabla tenga barra de desplazamiento horizontal */
     
 }
 
@@ -173,12 +178,16 @@ button {
 .modal {
     display: none; /* Oculto por defecto */
     position: fixed;
-    z-index: 1;
+    z-index: 1050;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro semitransparente */
+    justify-content: center; /* Centra el modal horizontalmente */
+    align-items: center; /* Centra el modal verticalmente */
+    overflow-y: auto;
+    
 }
 
 .modal-content {
@@ -189,10 +198,11 @@ button {
     width: 90%;
     max-width: 800px;
     border-radius: 8px;
-    overflow-y: auto;
+    overflow: hidden;
+    position: relative;
 }
 
-/* Botón de cierre del modal */
+
 /* Ajuste para el botón de cierre del modal ("X") */
 .close {
     position: absolute;
@@ -218,6 +228,19 @@ button {
     opacity: 0.7;
 }
 
+/* Título del modal */
+.modal-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Formulario */
+#maintainerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Espacio entre los elementos del formulario */
+}
 
 /* Estilos de filas y columnas en formularios */
 .form-row {
@@ -240,7 +263,7 @@ button {
 /* Botones de acción en formularios */
 .form-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 10px;
 }
 
@@ -252,103 +275,127 @@ button {
     cursor: pointer;
     background-color: #4CAF50; /* Verde para botones de acción */
     color: white;
+    transition: background-color 0.3s ease;
 }
 
 .form-actions button:hover {
     background-color: #45a049;
 }
 
-/* Ajuste responsivo para pantallas pequeñas */
+
+/* === Media Queries === */
+
+/* Pantallas pequeñas (max-width: 768px) */
 @media (max-width: 768px) {
-    .main-content {
-        margin-left: 0;
-        padding: 10px;
+    /* Barra lateral colapsada */
+    .sidebar {
+        width: 60px;
+        padding: 20px 5px;
     }
 
+    .sidebar h2,
+    .sidebar ul li a span {
+        display: none;
+    }
+
+    .container-fluid {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    /* Encabezado */
+    header {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    /* Navegación de pestañas */
     .tabs {
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .tab-button {
-        flex: 1 1 auto;
-        margin-bottom: 5px;
-    }
-
-    table {        
-        overflow-x: auto;
-    }
-
-    th, td {
-        text-align: left;
+        font-size: 0.9rem;
         padding: 8px;
     }
 
-    .form-row {
-        grid-template-columns: 1fr; /* Cambiar a una sola columna */
+    /* Formularios */
+    .search-form {
+        flex-direction: column;
+        gap: 10px;
     }
 
+    /* Tablas */
+    table {
+        font-size: 0.85rem;
+        overflow-x: auto;
+    }
+
+    /* Modal */
+    .modal-content {
+        width: 95%; /* Más pequeño en pantallas pequeñas */
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.3rem; /* Reducir el tamaño del título */
+    }
+
+    .form-actions button {
+        font-size: 0.9rem; /* Botones más compactos */
+        padding: 8px 15px;
+    }
+}
+
+/* Pantallas medianas (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
     .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
+        width: 200px;
+    }
+
+    .container-fluid {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .tab-button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    /* Modal */
+    .modal-content {
+        width: 90%;
+        max-width: 500px; /* Ajustar tamaño en pantallas medianas */
+        padding: 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem; /* Tamaño estándar del título */
     }
 }
 
-/* Ajuste responsivo para pantallas grandes */
-@media (min-width: 1200px) {
-    .main-content {
-        width: 100vw; /* Asegura que ocupe el ancho completo */
-        height: 100vh; /* Asegura que ocupe la altura completa */
-    }
-}
-
-/* Ajuste responsivo para pantallas medianas */
-@media (min-width: 768px) and (max-width: 1199px) {
-    .main-content {
-        max-width: 95%; /* Ajusta para pantallas medianas */
-    }
-}
-
-/* Ajustar el contenedor generado por DataTables */
-.dataTables_wrapper {
-    width: 100% !important; /* Asegurar que el contenedor de DataTables ocupe todo el ancho */
-    display: flex;
-    flex-direction: column;
-}
-
-/* Contenedor general para los controles superiores de DataTables */
-.dataTables_wrapper .row:first-child {
-    display: flex;
-    justify-content: space-between; /* Distribuye los elementos a los extremos */
-    align-items: center; /* Alinea verticalmente los elementos */
-    gap: 20px; /* Añade espacio entre los elementos */
-    flex-wrap: wrap; /* Permite que los elementos se acomoden en varias filas si es necesario */
-    width: 100%;
-    margin-bottom: 15px;
-}
-
-
-/* Ajustar el buscador de DataTables */
-.dataTables_filter {
-    flex: 1 1 auto; /* Permite que se ajuste al espacio disponible */
-    text-align: right; /* Alinea el buscador a la derecha */
-}
-
-/* Ajustar el selector de cantidad de entradas */
-.dataTables_length {
-    flex: 1 1 auto; /* Permite que se ajuste al espacio disponible */
-}
-
-/* Responsividad en pantallas pequeñas */
-@media (max-width: 768px) {
-    .dataTables_wrapper .row:first-child {
-        flex-direction: column; /* Coloca los elementos en una columna */
-        align-items: flex-start; /* Alinea los elementos al inicio */
-        gap: 15px; /* Reduce el espacio entre elementos */
+/* Pantallas grandes (min-width: 1025px) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px;
     }
 
-    .dataTables_filter, .dataTables_length {
-        text-align: left; /* Ajusta la alineación para pantallas pequeñas */
+    .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+
+    /* Modal */
+    .modal-content {
+        width: 90%;
+        max-width: 800px; /* Ancho máximo para pantallas grandes */
+        padding: 25px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
     }
 }
-

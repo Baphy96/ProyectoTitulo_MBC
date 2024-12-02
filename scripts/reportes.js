@@ -3,8 +3,8 @@ import { collection, query, where, getDocs } from "https://www.gstatic.com/fireb
 
 // Lógica para alternar pestañas
 document.addEventListener("DOMContentLoaded", () => {
-    // Referencia a la pestaña inicial
-    const reporteTab = document.getElementById("reporte-tab-content");
+    // Mostrar la pestaña inicial
+    const reporteTab = document.getElementById("reporte-tab-content"); // ID correcto
     if (reporteTab) {
         reporteTab.style.display = "block"; // Mostrar la pestaña inicial
     } else {
@@ -16,21 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             // Ocultar todas las pestañas
             document.querySelectorAll(".tab-content").forEach(tab => {
-                tab.style.display = "none";
+                tab.style.display = "none"; // Ocultar contenido
             });
 
             // Mostrar la pestaña seleccionada
             const tabId = button.getAttribute("data-tab");
             const selectedTab = document.getElementById(`${tabId}-tab-content`);
             if (selectedTab) {
-                selectedTab.style.display = "block";
+                selectedTab.style.display = "block"; // Mostrar contenido
             } else {
                 console.error(`No se encontró la pestaña con ID: ${tabId}-tab-content`);
             }
 
             // Actualizar el botón activo
             document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
+            button.classList.add("active"); // Añadir clase activa al botón actual
         });
     });
 });
@@ -43,49 +43,60 @@ const selectCampos = document.getElementById("campos-tabla");
 const tableBody = document.getElementById("resultsTableBody");
 const buscarBtn = document.getElementById("buscar");
 const exportarBtn = document.getElementById("exportar-btn");
+const exportarMenu = document.getElementById("exportar-menu");
 const filtrarBtn = document.getElementById("filtrar-btn");
 
 // Obtener datos desde Firestore
 async function obtenerDatos() {
     try {
-        // Referencias a las colecciones en Firestore
         const gestionCausasRef = collection(db, "causas");
         const honorariosRef = collection(db, "honorarios");
 
-        // Obtener los datos de las colecciones
         const gestionCausasSnap = await getDocs(gestionCausasRef);
         const honorariosSnap = await getDocs(honorariosRef);
 
-        // Convertir los datos a un formato procesable
-        const gestionCausas = gestionCausasSnap.docs.map(doc => doc.data());
-        const honorarios = honorariosSnap.docs.map(doc => doc.data());
-
-        // Consolidar datos por ROL
         const datosConsolidados = {};
 
-        // Agregar datos de causas
-        gestionCausas.forEach(causa => {
-            const rol = causa.rol;
-            if (!datosConsolidados[rol]) {
-                datosConsolidados[rol] = { ...causa, pagos: [] }; // Inicializar
+        // Procesar causas
+        gestionCausasSnap.docs.forEach(doc => {
+            const causa = doc.data();
+            if (!datosConsolidados[causa.rol]) {
+                datosConsolidados[causa.rol] = { ...causa, pagos: [] };
             }
         });
 
-        // Agregar datos de honorarios
-        honorarios.forEach(honorario => {
-            const rol = honorario.rol;
-            if (!datosConsolidados[rol]) {
-                datosConsolidados[rol] = { pagos: [] }; // Inicializar si no existe
+        // Procesar honorarios
+        honorariosSnap.docs.forEach(doc => {
+            const honorario = doc.data();
+            if (!datosConsolidados[honorario.rol]) {
+                datosConsolidados[honorario.rol] = { pagos: [] };
             }
-            datosConsolidados[rol].pagos.push({
-                monto: honorario.monto,
-                fechaPago: honorario.fechaDocumento,
-                tipoDocumento: honorario.tipoDocumento,
-                numeroDocumento: honorario.numeroDocumento
-            });
+
+            datosConsolidados[honorario.rol] = {
+                ...datosConsolidados[honorario.rol],
+                rut: honorario.rutCliente || "-",
+                nombreCliente: honorario.nombreCliente || "-",
+                tipoDocumento: honorario.tipoDocumento || "-",
+                numeroDocumento: honorario.numeroDocumento || "-",
+                fechaDocumento: honorario.fechaDocumento || "-",
+                monto: honorario.monto || 0
+            };
+
+            // Agregar pagos si existen
+            if (Array.isArray(honorario.pagos)) {
+                honorario.pagos.forEach(pago => {
+                    datosConsolidados[honorario.rol].pagos.push({
+                        monto: pago.monto,
+                        fechaPago: pago.fechaPago,
+                        tipoPago: pago.tipoPago,
+                        numeroDocumentoPago: pago.numDocumentoPago || "-"
+                    });
+                });
+            }
         });
 
         // Convertir a un array para procesarlo
+        console.log("Datos consolidados con pagos:", datosConsolidados);
         return Object.values(datosConsolidados);
     } catch (error) {
         console.error("Error al obtener datos de Firestore:", error);
@@ -98,8 +109,9 @@ function generarOpciones() {
     const headers = document.querySelectorAll("#reportesTable thead th");
     headers.forEach(header => {
         const option = document.createElement("option");
-        option.value = header.textContent.trim();
-        option.textContent = header.textContent.trim();
+        const headerText = header.textContent.trim();
+        option.value = headerText;
+        option.textContent = headerText;
         selectCampos.appendChild(option);
     });
 
@@ -118,66 +130,91 @@ function generarOpciones() {
 
 // Renderizar datos en la tabla
 function renderizarTabla(datos) {
-    tableBody.innerHTML = ""; // Limpiar tabla
+    const tableBody = document.getElementById("resultsTableBody");
+    tableBody.innerHTML = ""; // Limpiar la tabla
 
     datos.forEach(dato => {
         const row = document.createElement("tr");
 
+        // Cálculo de total de abonos
         const totalAbono = Array.isArray(dato.pagos)
-        ? dato.pagos.reduce((sum, pago, index) => {
-            console.log(`Pago #${index + 1}:`, pago); // Mostrar todos los campos del objeto 'pago'
-            const montoPago = parseFloat(pago.monto) || 0; // Convertir el monto a número
-            return sum + montoPago; // Sumar el monto al acumulador
-        }, 0)
-        : 0; // Si 'pagos' no es un arreglo, el abono es 0
+            ? dato.pagos.reduce((sum, pago) => sum + (parseFloat(pago.monto) || 0), 0)
+            : 0;
 
-        // Calcular saldo (monto - abono)
-const saldo = (dato.monto || 0) - (totalAbono || 0);
+        // Cálculo de saldo
+        const saldo = (dato.monto || 0) - totalAbono;
+
+          // Obtener asistentes legales como una lista separada por comas
+          const asistentesLegales = Array.isArray(dato.asistentesLegales)
+          ? dato.asistentesLegales.join(", ") // Concatenar con comas
+          : "-"; // Mostrar "-" si no hay asistentes
 
 
-        // Obtener tipo de documento, número de documento, fecha, y monto
-        const tipoDocumento = dato.pagos.map(p => p.tipoDocumento).join(", ") || "-";
-        const numeroDocumento = dato.pagos.map(p => p.numeroDocumento).join(", ") || "-";
-        const fechasDocumento = dato.pagos.map(p => p.fechaPago || p.fechaDocumento).join(", ") || "-";
-        const montosDocumento = dato.pagos.map(p => p.monto || "-").join(", ");
-
-        // Agregar celdas a la fila según los encabezados de la tabla
+        // Renderizado de fila
         row.innerHTML = `
             <td>${dato.rut || "-"}</td>
-            <td>${dato.nombre || dato.nombreCliente || "-"}</td>
+            <td>${dato.nombreCliente || "-"}</td>
             <td>${dato.rol || "-"}</td>
             <td>${dato.tipoServicio || "-"}</td>
             <td>${dato.fechaIngreso || "-"}</td>
             <td>${dato.abogadoResponsable || "-"}</td>
-            <td>${dato.asistentesLegales?.join(", ") || "-"}</td>
+            <td>${asistentesLegales}</td>
             <td>${dato.tribunal || "-"}</td>
             <td>${dato.demandado || "-"}</td>
             <td>${dato.receptorJudicial || "-"}</td>
             <td>${dato.abogadoCoordinador || "-"}</td>
             <td>${dato.estado || "-"}</td>
-            <td>${tipoDocumento}</td>
-            <td>${numeroDocumento}</td>
-            <td>${fechasDocumento}</td>
-            <td>${montosDocumento}</td>
+            <td>${dato.tipoDocumento || "-"}</td>
+            <td>${dato.numeroDocumento || "-"}</td>
+            <td>${dato.fechaDocumento || "-"}</td>
+            <td>${dato.monto || 0}</td>
             <td>${totalAbono}</td>
             <td>${saldo}</td>
         `;
 
         tableBody.appendChild(row);
     });
+    
 
-    // Si no hay datos, agregar una fila vacía
+    // Si no hay datos, mostrar un mensaje
     if (datos.length === 0) {
-        const emptyRow = document.createElement("tr");
-        emptyRow.innerHTML = `<td colspan="18">No se encontraron datos</td>`;
-        tableBody.appendChild(emptyRow);
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="18" class="text-center">No se encontraron datos</td>`;
+        tableBody.appendChild(row);
     }
 
-    // Inicializar o refrescar DataTables
-    if (!$.fn.DataTable.isDataTable("#reportesTable")) {
+    
+
+     // Inicializa o refresca DataTables
+     if (!$.fn.DataTable.isDataTable("#reportesTable")) {
         $('#reportesTable').DataTable({
-            scrollX: true,
-            responsive: true,
+            scrollX: true, // Habilita el desplazamiento horizontal
+            autoWidth: false, // Evita el ajuste automático de las columnas
+            columnDefs:  [
+                {
+                    targets: [15, 16, 17], // Índices de las columnas Monto, Abono, Saldo
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return new Intl.NumberFormat('es-CL').format(data); // Formato con separadores
+                        }
+                        return data; // Para exportar o filtrar, usa el valor original
+                    }
+                },
+                {
+                    targets: [4, 14], // Índices de las columnas Fecha de Ingreso y Fecha de Documento
+                    render: function(data, type, row) {
+                        if (type === 'display' && data) {
+                            const fecha = new Date(data); // Convierte la fecha a objeto Date
+                            const dia = String(fecha.getDate()).padStart(2, '0'); // Día con dos dígitos
+                            const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Mes con dos dígitos
+                            const anio = String(fecha.getFullYear()).slice(-4); // Últimos dos dígitos del año
+                            return `${dia}-${mes}-${anio}`; // Formato dd-mm-aa
+                        }
+                        return data; // Para exportar o filtrar, usa el valor original
+                    }
+                },
+                { targets: "_all", className: "dt-center" } // Centra todas las columnas
+            ],
             language: {
                 decimal: ",",
                 thousands: ".",
@@ -195,38 +232,41 @@ const saldo = (dato.monto || 0) - (totalAbono || 0);
                 },
                 loadingRecords: "Cargando...",
                 processing: "Procesando...",
-                emptyTable: "No hay datos disponibles en la tabla",
-                aria: {
-                    sortAscending: ": activar para ordenar de forma ascendente",
-                    sortDescending: ": activar para ordenar de forma descendente"
-                }
+                emptyTable: "No hay datos disponibles en la tabla"
             }
         });
     } else {
-        $('#reportesTable').DataTable().draw(); // Refrescar DataTables
+        $('#reportesTable').DataTable().draw(); // Refrescar tabla
     }
 }
 
 
 // Filtrar columnas según opciones seleccionadas
 function filtrarColumnas(camposSeleccionados) {
-    const headers = document.querySelectorAll("#reportesTable thead th");
-    const allCells = document.querySelectorAll("#reportesTable tbody tr td");
+    // Referencia a la instancia de DataTables
+    const tabla = $('#reportesTable').DataTable();
 
-    headers.forEach((header, index) => {
-        const isVisible = camposSeleccionados.includes(header.textContent.trim());
-        header.style.display = isVisible ? "" : "none"; // Mostrar/ocultar encabezado
-
-        // Mostrar/ocultar celdas de cada columna
-        allCells.forEach((cell, cellIndex) => {
-            if (cellIndex % headers.length === index) {
-                cell.style.display = isVisible ? "" : "none";
-            }
-        });
+    // Iterar sobre las columnas de DataTables
+    tabla.columns().every(function(index) {
+        const header = $(this.header()).text().trim(); // Obtener el nombre del encabezado de la columna
+        const visible = camposSeleccionados.includes(header); // Verificar si el campo está seleccionado
+        console.log(`Columna: ${header}, visible: ${visible}`); // Debug: imprimir estado de visibilidad
+        tabla.column(index).visible(visible); // Mostrar u ocultar la columna
     });
+
+    // Ajustar y redibujar la tabla para aplicar los cambios
+    tabla.columns.adjust().draw();
 }
 
-// Exportar datos a CSV
+
+// Cerrar el menú al hacer clic fuera de él
+document.addEventListener("click", (e) => {
+    if (!exportarBtn.contains(e.target) && !exportarMenu.contains(e.target)) {
+        exportarMenu.style.display = "none";
+    }
+});
+
+// Función para exportar a CSV
 function exportarCSV() {
     let csvContent = "data:text/csv;charset=utf-8,";
     const headers = Array.from(document.querySelectorAll("#reportesTable thead th"))
@@ -251,29 +291,120 @@ function exportarCSV() {
     document.body.removeChild(link);
 }
 
+// Función para exportar a Excel
+function exportarExcel() {
+    const headers = Array.from(document.querySelectorAll("#reportesTable thead th"))
+        .filter(th => th.style.display !== "none")
+        .map(th => th.textContent.trim());
+
+    const rows = Array.from(document.querySelectorAll("#reportesTable tbody tr")).map(row =>
+        Array.from(row.querySelectorAll("td"))
+            .filter(td => td.style.display !== "none")
+            .map(td => td.textContent.trim())
+    );
+
+    // Crear el libro de Excel usando XLSX
+    const wb = XLSX.utils.book_new();
+    const wsData = [headers, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+
+    // Descargar el archivo Excel
+    XLSX.writeFile(wb, "reporte.xlsx");
+}
+
+// Asocia las funciones a las opciones del menú
+document.getElementById("exportar-csv").addEventListener("click", (e) => {
+    e.preventDefault(); // Evita el comportamiento por defecto del enlace
+    exportarCSV();
+    exportarMenu.style.display = "none"; // Oculta el menú
+});
+
+document.getElementById("exportar-excel").addEventListener("click", (e) => {
+    e.preventDefault(); // Evita el comportamiento por defecto del enlace
+    exportarExcel();
+    exportarMenu.style.display = "none"; // Oculta el menú
+});
+
 // Eventos principales
 buscarBtn.addEventListener("click", async () => {
+    // Obtener los valores de los campos de período
     const desde = document.getElementById("periodoDesde").value;
     const hasta = document.getElementById("periodoHasta").value;
 
-    const datos = await obtenerDatos();
+    console.log("Filtrando por período:", { desde, hasta });
 
-    // Filtrar datos según el periodo seleccionado
-    const datosFiltrados = datos.filter(dato => {
-        const fechaIngreso = new Date(dato["Fecha de Ingreso"]);
-        return (!desde || fechaIngreso >= new Date(desde)) &&
-               (!hasta || fechaIngreso <= new Date(hasta));
-    });
+    try {
+        // Obtener todos los datos
+        const datos = await obtenerDatos();
+        console.log("Datos originales obtenidos:", datos);
 
-    renderizarTabla(datosFiltrados);
+        // Filtrar los datos según el período
+        const datosFiltrados = datos.filter(dato => {
+            const fechaIngreso = dato.fechaIngreso ? new Date(dato.fechaIngreso) : null;
+
+            if (!fechaIngreso) return false; // Excluir registros sin fecha válida
+
+            console.log("Comparando fechas:", {
+                fechaIngreso,
+                desde: desde ? new Date(desde) : "Sin límite inferior",
+                hasta: hasta ? new Date(hasta) : "Sin límite superior",
+            });
+
+            // Verificar si la fecha está dentro del rango
+            return (!desde || fechaIngreso >= new Date(desde)) &&
+                   (!hasta || fechaIngreso <= new Date(hasta));
+        });
+
+        console.log("Datos filtrados:", datosFiltrados);
+
+        // Actualizar la tabla con los datos filtrados
+        const tabla = $('#reportesTable').DataTable(); // Referencia a DataTables
+        tabla.clear(); // Limpiar datos existentes
+        datosFiltrados.forEach(dato => {
+            // Agregar fila a DataTables
+            tabla.row.add([
+                dato.rut || "-",
+                dato.nombreCliente || "-",
+                dato.rol || "-",
+                dato.tipoServicio || "-",
+                dato.fechaIngreso || "-",
+                dato.abogadoResponsable || "-",
+                dato.asistentesLegales?.join(", ") || "-",
+                dato.tribunal || "-",
+                dato.demandado || "-",
+                dato.receptorJudicial || "-",
+                dato.abogadoCoordinador || "-",
+                dato.estado || "-",
+                dato.tipoDocumento || "-",
+                dato.numeroDocumento || "-",
+                dato.fechaDocumento || "-",
+                dato.monto || 0,
+                dato.pagos ? dato.pagos.reduce((sum, pago) => sum + (parseFloat(pago.monto) || 0), 0) : 0,
+                (dato.monto || 0) - (dato.pagos ? dato.pagos.reduce((sum, pago) => sum + (parseFloat(pago.monto) || 0), 0) : 0),
+            ]);
+        });
+        tabla.draw(); // Refrescar la tabla con los datos actualizados
+    } catch (error) {
+        console.error("Error al consultar datos:", error);
+    }
 });
 
-filtrarBtn.addEventListener("click", () => {
-    const seleccionados = $('#campos-tabla').val();
-    filtrarColumnas(seleccionados);
+
+document.getElementById("filtrar-btn").addEventListener("click", () => {
+    // Obtener los campos seleccionados en el filtro
+    const camposSeleccionados = $('#campos-tabla').val(); // Array con los nombres de las columnas seleccionadas
+    console.log("Campos seleccionados:", camposSeleccionados);
+
+    // Llamar a la función para filtrar las columnas
+    filtrarColumnas(camposSeleccionados);
 });
 
-exportarBtn.addEventListener("click", exportarCSV);
+
+// Mostrar/Ocultar el menú al hacer clic en el botón
+exportarBtn.addEventListener("click", () => {
+    exportarMenu.style.display = exportarMenu.style.display === "none" ? "block" : "none";
+});
 
 
 // Inicialización
@@ -531,14 +662,26 @@ async function obtenerDatosHonorariosAcumulados() {
 function renderizarGrafico(tipo, datos) {
     if (graficoActual) graficoActual.destroy(); // Limpiar gráfico anterior
 
+    // Referencia al elemento de monto acumulado
+    const montoAcumuladoElement = document.getElementById("monto-acumulado");
+    if (montoAcumuladoElement) {
+        // Limpiar el contenido del monto acumulado antes de generar un nuevo gráfico
+        montoAcumuladoElement.textContent = "";
+    }
+
     if (tipo === "distribucion") {
+        // Calcular el total de casos para el gráfico de distribución
+        const totalCasos = datos.estados.reduce((sum, estado) => {
+            return sum + estado.valores.reduce((subSum, value) => subSum + value, 0);
+        }, 0);
+
         graficoActual = new Chart(graficoCanvas, {
             type: "bar",
             data: {
                 labels: datos.abogados,
                 datasets: datos.estados.map((estado, index) => ({
                     label: estado.nombre,
-                    data: estado.valores.map(value => (value === 0 ? null : value)), // Reemplaza 0 por null
+                    data: estado.valores,
                     backgroundColor: `rgba(${index * 50}, ${100 + index * 20}, ${200 - index * 30}, 0.6)`,
                 })),
             },
@@ -546,8 +689,12 @@ function renderizarGrafico(tipo, datos) {
                 responsive: true,
                 plugins: {
                     datalabels: {
-                        display: (context) => context.dataset.data[context.dataIndex] !== null, // Muestra solo si no es null
-                        formatter: (value) => value, // Muestra el valor
+                        formatter: (value, context) => {
+                            if (value === 0) return ""; // No mostrar valores 0
+                            const porcentaje = totalCasos > 0 ? ((value / totalCasos) * 100).toFixed(2) : 0;
+                            return `${value} (${porcentaje}%)`; // Mostrar valor y porcentaje
+                        },
+                        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Solo mostrar si el valor no es 0
                         color: "#000",
                         font: {
                             weight: "bold",
@@ -562,6 +709,9 @@ function renderizarGrafico(tipo, datos) {
             plugins: [ChartDataLabels],
         });
     } else if (tipo === "estadoPago") {
+        // Calcular el total de pagos
+        const totalPagos = datos.pagados + datos.pendientes;
+
         graficoActual = new Chart(graficoCanvas, {
             type: "doughnut",
             data: {
@@ -577,7 +727,12 @@ function renderizarGrafico(tipo, datos) {
                 responsive: true,
                 plugins: {
                     datalabels: {
-                        formatter: (value) => value, // Muestra el valor sobre cada sección
+                        formatter: (value, context) => {
+                            if (value === 0) return ""; // No mostrar valores 0
+                            const porcentaje = totalPagos > 0 ? ((value / totalPagos) * 100).toFixed(2) : 0;
+                            return `${value} (${porcentaje}%)`; // Mostrar valor y porcentaje
+                        },
+                        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Solo mostrar si el valor no es 0
                         color: "#000",
                         font: {
                             weight: "bold",
@@ -588,6 +743,9 @@ function renderizarGrafico(tipo, datos) {
             plugins: [ChartDataLabels],
         });
     } else if (tipo === "honorariosAcumulados") {
+        // Calcular el total de honorarios acumulados
+        const totalHonorarios = datos.valores.reduce((sum, value) => sum + value, 0);
+
         graficoActual = new Chart(graficoCanvas, {
             type: "line",
             data: {
@@ -605,7 +763,11 @@ function renderizarGrafico(tipo, datos) {
                 responsive: true,
                 plugins: {
                     datalabels: {
-                        formatter: (value) => value, // Muestra el valor en cada punto de la línea
+                        formatter: (value, context) => {
+                            if (value === 0) return ""; // No mostrar valores 0
+                            return new Intl.NumberFormat('es-CL').format(value); // Formato con separador de miles
+                        },
+                        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Solo mostrar si el valor no es 0
                         color: "#000",
                         font: {
                             weight: "bold",
@@ -615,15 +777,27 @@ function renderizarGrafico(tipo, datos) {
             },
             plugins: [ChartDataLabels],
         });
+
+        // Mostrar el monto acumulado por periodo filtrado al final del gráfico
+        if (montoAcumuladoElement) {
+            montoAcumuladoElement.textContent = `Monto acumulado del período: ${new Intl.NumberFormat('es-CL').format(totalHonorarios)}`;
+        }
     }
 }
 
 
-function limpiarPrevisualizacion() {
-    const graficoCanvas = document.getElementById("grafico-preview").getContext("2d");
-    graficoCanvas.clearRect(0, 0, graficoCanvas.canvas.width, graficoCanvas.canvas.height);
-}
 
+
+function limpiarPrevisualizacion() {
+    // Limpiar el canvas
+    graficoCanvas.getContext("2d").clearRect(0, 0, graficoCanvas.width, graficoCanvas.height);
+
+    // Si hay un gráfico actual, destruirlo
+    if (graficoActual) {
+        graficoActual.destroy();
+        graficoActual = null; // Asegurarse de que no haya referencia al gráfico anterior
+    }
+}
 
 
 // ========= Función para filtros ===============
@@ -671,23 +845,25 @@ function mostrarFiltros(tipo) {
 document.getElementById("btn-distribucion").addEventListener("click", () => {
     activarBoton("btn-distribucion");
     mostrarFiltros("distribucion");
-    limpiarPrevisualizacion(); 
+    limpiarPrevisualizacion();
 });
 
 document.getElementById("btn-estado-pago").addEventListener("click", () => {
     activarBoton("btn-estado-pago");
     mostrarFiltros("estadoPago");
-    limpiarPrevisualizacion(); 
+    limpiarPrevisualizacion();
 });
 
 document.getElementById("btn-honorarios-acumulados").addEventListener("click", () => {
     activarBoton("btn-honorarios-acumulados");
     mostrarFiltros("honorariosAcumulados");
-    limpiarPrevisualizacion(); 
+    limpiarPrevisualizacion();
 });
 
 // Evento del botón buscar
 btnBuscar.addEventListener("click", async () => {
+    limpiarPrevisualizacion(); // Limpiar siempre antes de renderizar un nuevo gráfico
+    
     // Aquí implementa la lógica para obtener datos y renderizar gráficos
     const tipo = document.querySelector(".btn-report.active").id;
     if (tipo === "btn-distribucion") {
@@ -706,14 +882,92 @@ btnBuscar.addEventListener("click", async () => {
 });
 
 // Evento para exportar gráfico como PDF
+// Extraer jsPDF desde la librería que está en el espacio de nombres
 const { jsPDF } = window.jspdf;
 
+// Evento para exportar toda la sección de previsualización como PDF
 btnExportarPdf.addEventListener("click", () => {
-    const pdf = new jsPDF();
-    pdf.text("Reporte de Gráficos", 10, 10);
-    pdf.addImage(graficoCanvas.toDataURL("image/png"), "PNG", 10, 20, 190, 100);
-    pdf.save("reporte.pdf");
+    // Seleccionar el gráfico dentro de la tarjeta en lugar de la tarjeta completa
+    const graficoCanvas = document.getElementById("grafico-preview");
+
+    // Validar que el elemento tenga dimensiones válidas antes de la captura
+    const rect = graficoCanvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+        console.error("El elemento #grafico-preview tiene dimensiones no válidas para ser capturado.");
+        return;
+    }
+
+    // Esperar un momento para asegurar que el gráfico se haya renderizado correctamente
+    setTimeout(() => {
+        // Utilizar html2canvas para capturar el gráfico
+        html2canvas(graficoCanvas, { scale: 3, useCORS: true, crossOrigin: 'anonymous' }).then((canvas) => {
+            try {
+                // Validar las dimensiones del canvas
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+
+                if (!canvasWidth || !canvasHeight || canvasWidth <= 0 || canvasHeight <= 0) {
+                    throw new Error("Canvas dimensions are invalid.");
+                }
+
+                // Crear una instancia de jsPDF
+                const pdf = new jsPDF({
+                    orientation: "portrait", // Orientación del PDF
+                    unit: "px",
+                    format: "a4"
+                });
+
+                // Añadir título y fecha al PDF con estilo más claro
+                pdf.setFontSize(20);
+                pdf.setTextColor("#003366");
+                pdf.text("Reporte de Gráficos", 20, 30);
+
+                pdf.setFontSize(12);
+                pdf.setTextColor("#333333");
+                pdf.text(`Fecha de generación: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 20, 50);
+
+                // Convertir el canvas a imagen en formato JPEG para mayor compatibilidad y calidad
+                const imgData = canvas.toDataURL("image/jpeg", 0.9);
+
+                // Calcular el ancho y alto del PDF en función del tamaño A4
+                const pdfWidth = pdf.internal.pageSize.getWidth() - 40; // Ancho disponible con márgenes laterales de 20px
+                const pdfHeight = pdf.internal.pageSize.getHeight() - 90; // Alto disponible con margen superior de 60px y margen inferior de 30px
+
+                // Mantener la proporción al ajustar el tamaño de la imagen al PDF
+                let ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
+
+                // Validación de ratio
+                if (isNaN(ratio) || ratio <= 0) {
+                    ratio = 1; // Valor predeterminado si el cálculo del ratio no es válido
+                }
+
+                const imgWidth = canvasWidth * ratio;
+                const imgHeight = canvasHeight * ratio;
+
+                // Validar que las dimensiones calculadas sean válidas
+                if (isNaN(imgWidth) || isNaN(imgHeight) || imgWidth <= 0 || imgHeight <= 0) {
+                    throw new Error("Calculated image dimensions are invalid.");
+                }
+
+                // Añadir la imagen al PDF
+                pdf.addImage(imgData, "JPEG", 20, 70, imgWidth, imgHeight);
+
+                // Añadir pie de página
+                pdf.setFontSize(10);
+                pdf.setTextColor("#666666");
+                pdf.text("Este reporte ha sido generado automáticamente por el sistema de gestión.", 20, pdf.internal.pageSize.getHeight() - 20);
+
+                // Guardar el archivo PDF generado
+                pdf.save("reporte_grafico.pdf");
+            } catch (error) {
+                console.error("Error al añadir la imagen al PDF:", error);
+            }
+        }).catch((error) => {
+            console.error("Error al generar el PDF:", error);
+        });
+    }, 1000); // Retrasar 1000ms para asegurar que el gráfico se haya renderizado correctamente
 });
+
 
 // Inicializar filtros al cargar la página
 document.addEventListener("DOMContentLoaded", async () => {

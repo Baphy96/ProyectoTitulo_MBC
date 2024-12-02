@@ -3,27 +3,28 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
     margin: 0;
+    
 }
 
-/* Ajuste del contenido principal para pantallas grandes */
-.content {
-    margin-left: 250px; /* Asegura que el contenido tenga suficiente margen para no quedar debajo de la barra lateral */
-    max-width: calc(100% - 250px); /* Asegura que el contenido ocupe el espacio correcto */
-    padding: 20px; /* Espacio adicional alrededor del contenido */
-    transition: margin-left 0.3s ease;
-    
-    }
+/* Contenedor principal */
+.container-fluid {
+    padding: 0 15px;
+    margin-left: 250px; /* Asegura espacio para la barra lateral */
+    width: calc(100% - 250px); /* Ocupa el espacio restante */   
+    transition: margin-left 0.3s ease, width 0.3s ease;
+            
+}
 
 
 /* Encabezado */
 header {
     background-color: #2c3e50;
     color: white;
-    padding: 15px 20px; /* Espacio aumentado */
+    padding: 15px 20px; /* Reducir el padding para ahorrar espacio */
     text-align: center;
-    width: 100vw; /* Ocupa todo el ancho de la ventana del navegador */
-    max-width: 1640px; /* Límite opcional */
-}
+    width: 100%; /* Reducir el ancho horizontal */
+    
+    }
 
 
 /* Sección de filtros */
@@ -36,10 +37,10 @@ header {
 
 /* Estilos de contenedor flex */
 .filter-section .d-flex {
-    display: flex;
-    justify-content: space-between; /* Alinea elementos en los extremos */
-    align-items: center;
     flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Ajuste para el formulario de filtros */
@@ -79,28 +80,9 @@ header {
     font-size: 0.9rem;
 }
 
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 768px) {
-    .filter-section .d-flex {
-        flex-direction: column;
-        align-items: center;
-    }
-    .filter-section form {
-        flex-direction: column;
-        align-items: center;
-    }
-    .filter-section .form-group,
-    #addCause,
-    #buscar {
-        margin-bottom: 10px;
-        width: 100%;
-        align-self: center; /* Centraliza en pantallas pequeñas */
-    }
-}
-
 /* Estilos para campos de entrada y botones */
 input, button {
-    padding: 10px;
+    padding: 5px;
     font-size: 0.9rem; /* Tamaño de fuente para campos de entrada y botones */
     border: 1px solid #bdc3c7;
     border-radius: 5px;
@@ -123,32 +105,30 @@ button {
     background-color: #ed2e19;/* Rojo para "Eliminar" */
 }
 
-/* Estilos para la sección de resultados */
-.results-section {
-    width: 100%;
-    overflow-x: auto; /* Añadir desplazamiento horizontal si el contenido no cabe */
-    padding: 10px; /* Ajuste del padding */
-}
+/* Estilo de la Tabla */
 table {
-    width: 100%; /* Reducir el ancho de la tabla al 90% del contenedor */
+    width: 100%; /* Hacer la tabla tan amplia como el contenedor */
     max-width: 1800px; /* Limitar el ancho máximo */
     border-collapse: collapse;
-    margin: 10px auto; /* Centrar la tabla y ajustar el margen */
+    margin: 10px auto; /* Centrar la tabla */
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    font-size: 0.9rem; /* Reducir el tamaño de fuente */
-    
+    font-size: 0.9rem; /* Tamaño de fuente similar a la tabla de causas */    
 }
 
 th, td {
-    padding: 8px;
+    padding: 8px 10px; /* Espaciado adecuado */
     text-align: left; /* Cambiar a derecha si es necesario */
     word-wrap: break-word; /* Dividir palabras largas */
     white-space: normal; /* Permitir varias líneas */
+    overflow: hidden;
 }
 
+/* Encabezados */
 th {
     background-color: #34495e;
     color: white;
+    text-align: center;
+    padding: 10px; /* Ajustar padding para mayor consistencia */
 }
 
 
@@ -371,12 +351,6 @@ button[type="submit"]:hover {
 }
 
 
-@media (min-width: 768px) {
-    #asistentesLegalesContainer {
-        grid-template-columns: repeat(3, 1fr); /* Tres columnas en pantallas más grandes */
-    }
-}
-
 /* Estilo para el asterisco en campos obligatorios */
 .required {
     color: red;
@@ -421,38 +395,12 @@ button[type="submit"]:hover {
     font-size: 1rem;
 }
 
-/* Ajustes para botones en pantallas pequeñas */
-/* Ajustes responsivos */
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
-    }
-    .modal-content {
-        padding: 15px; /* Menos padding */
-    }
-    .modal-content input,
-    .modal-content select,
-    .modal-content button {
-        font-size: 0.9rem;
-        padding: 10px;
-    }
-    #asistentesLegalesContainer {
-        grid-template-columns: 1fr 1fr; /* Dos columnas en pantallas más pequeñas */
-    }
-}
-
-
-
-
-
-
-
 
 
 /* Asegurar que la tabla ocupe el espacio completo disponible */
 .table-responsive {
     width: 100%; /* Asegura que la tabla se expanda en todo el contenedor */
-    overflow-x: visible; /* Para que la tabla no tenga barra de desplazamiento horizontal */
+    overflow-x: auto; /* Para que la tabla no tenga barra de desplazamiento horizontal */
     
 }
 
@@ -461,13 +409,6 @@ button[type="submit"]:hover {
     font-size: 0.9em; /* Tamaño de letra estándar */
     padding: 8px 10px; /* Añadir padding para una mejor separación entre celdas */
     text-align: left; /* Alineación del texto a la izquierda para mejor legibilidad */
-}
-
-/* Ajuste del ancho máximo de las celdas para pantallas grandes */
-@media (min-width: 1200px) {
-    .table-responsive th, .table-responsive td {
-        padding: 5px; /* Dar más espacio a las celdas en pantallas grandes */
-    }
 }
 
 /* Permitir que el texto se expanda y ajuste en múltiples líneas en ciertas columnas */
@@ -486,39 +427,103 @@ button[type="submit"]:hover {
     text-overflow: ellipsis; /* Mostrar puntos suspensivos si el contenido no cabe */
 }
 
-/* Ajuste para pantallas pequeñas */
+/* === Media Queries === */
+
+/* Pantallas pequeñas (max-width: 768px) */
 @media (max-width: 768px) {
-    .table-responsive td, .table-responsive th {
-        font-size: 0.8em; /* Reducir el tamaño de letra en pantallas pequeñas */
-        padding: 6px 8px; /* Reducir el padding para hacer la tabla más compacta */
+    /* La barra lateral se reduce automáticamente */
+    .sidebar {
+        width: 60px;
+        padding: 20px 5px;
     }
 
-    .table-responsive {
-        overflow-x: auto; /* Añadir desplazamiento horizontal en pantallas pequeñas */
+    .sidebar h2,
+    .sidebar ul li a span {
+        display: none; /* Oculta el texto y el título */
     }
 
-    /* Ajustar columnas específicas para evitar desbordamiento en pantallas pequeñas */
-    .table-responsive td.nombre-cliente,
-    .table-responsive td.tribunal,
-    .table-responsive td.abogado-responsable {
-        white-space: normal; /* Permitir saltos de línea */
-        max-width: unset; /* Eliminar restricciones de ancho para permitir una mejor visualización */
+    .sidebar ul li a {
+        justify-content: center;
+    }
+
+    .sidebar ul li a i {
+        margin-right: 0; /* Sin margen lateral */
+    }
+
+    /* Ajuste del contenido principal */
+    .container-fluid {
+        margin-left: 60px; /* Reduce el margen para ajustarse a la barra lateral colapsada */
+        width: calc(100% - 60px);
+    }
+
+    /* Ajustes en encabezado */
+    header {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    /* Ajustes en filtros */
+    .filter-section .d-flex {
+        flex-direction: column; /* Coloca los filtros en una columna */
+        align-items: flex-start; /* Alineación al inicio */
+        gap: 15px;
+    }
+
+    .filter-section form {
+        flex-wrap: wrap; /* Permite que los campos se ajusten automáticamente */
+        gap: 10px;
+    }
+
+    table {
+        font-size: 0.85rem; /* Ajusta el tamaño de la fuente */
+    }
+
+    #buscar,
+    #addCause {
+        font-size: 0.8rem;
+        padding: 6px 10px; /* Botones más compactos */
+    }
+
+    .modal-dialog {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        margin: 0;
+    }
+
+    .modal-content {
+        padding: 10px; /* Reduce el padding interno */
     }
 }
 
+/* Pantallas medianas (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Barra lateral tamaño intermedio */
+    .sidebar {
+        width: 200px;
+    }
 
-/* Ajuste para pantallas más grandes */
-@media (min-width: 1200px) {
-    .content {
-        max-width: 1600px; /* Más ancho para pantallas muy grandes */
-        padding: 30px; /* Añadir un poco más de espacio alrededor */
+    .container-fluid {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .filter-section .d-flex {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    table {
+        font-size: 0.9rem; /* Tamaño de fuente estándar */
     }
 }
 
-/* Ajuste del margen izquierdo del contenido para pantallas más pequeñas */
-@media (max-width: 768px) {
-    .content {
-        margin-left: 250px; /* Elimina el margen izquierdo en pantallas pequeñas */
-        padding: 10px; /* Reduce el padding para optimizar espacio */
+/* Pantallas grandes (min-width: 1025px) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
     }
 }

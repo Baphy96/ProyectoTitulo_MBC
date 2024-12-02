@@ -2,6 +2,7 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;    
+    margin: 0;
 }
 
 /* Contenedor principal */
@@ -9,7 +10,7 @@ body {
     padding: 0 15px;
     margin-left: 250px; /* Asegura espacio para la barra lateral */
     width: calc(100% - 250px); /* Ocupa el espacio restante */   
-        
+    transition: margin-left 0.3s ease, width 0.3s ease;        
 }
 
 /* Encabezado */
@@ -20,6 +21,74 @@ header {
     text-align: center;
     width: 100%; /* Reducir el ancho horizontal */
     }
+
+ /* Estilos para la tabla */
+    #reportesTable th,
+    #reportesTable td {
+        min-width: 150px;
+        white-space: nowrap;
+        text-align: left; /* Opcional: Cambia a 'center' o 'right' según el caso */
+        overflow: hidden; /* Oculta contenido desbordado */
+        text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
+    }
+    
+    /* Ajustar el contenedor para tablas largas */
+    #reportesTable_wrapper {
+        overflow-x: auto;
+        padding-bottom: 10px; /* Espaciado adicional debajo de la tabla */
+    }
+
+/* Boton exportar */
+.exportar-btn-top-right {
+    position: absolute;
+    top: 10px; /* Ajusta la distancia desde el borde superior */
+    right: 10px; /* Ajusta la distancia desde el borde derecho */
+    z-index: 10; /* Asegura que el botón esté encima del gráfico */
+}
+
+    
+/* Sección de filtros */
+.filter-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Espacio entre los elementos */
+    justify-content: flex-start;
+    align-items: flex-end;;
+    margin-bottom: 20px;
+}
+
+.filter-section .form-group {
+    flex: 1 1 auto; /* Permite que los elementos se expandan según el espacio disponible */
+    min-width: 200px; /* Ancho mínimo de cada campo */
+    box-sizing: border-box;
+}
+
+.filter-section input,
+.filter-section select {
+    width: 100%;
+    max-width: 300px; /* Limita el ancho máximo de los campos */
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.filter-section button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-section button:hover {
+    background-color: #0056b3;
+}
+
 
     /* Navegación de pestañas */
 .tabs {
@@ -32,6 +101,7 @@ header {
 .tab-buttons {
     display: flex;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* Asegura que los botones se ajusten en pantallas pequeñas */
 }
 
 .tab-button {
@@ -69,6 +139,84 @@ header {
 }
 
 
+/* Ajuste para los checkboxes y sus etiquetas */
+.multiselect-container {
+    display: none; /* Oculta el menú por defecto */
+    position: absolute;
+    z-index: 1000;
+    background-color: #ffffff; /* Fondo blanco para claridad */
+    border: 1px solid #ddd; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    max-height: 300px; /* Altura máxima para evitar que sea muy largo */
+    overflow-y: auto; /* Habilitar scroll si es necesario */
+    padding: 10px; /* Espaciado interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para mayor visibilidad */
+}
+
+/* Mostrar menú cuando se despliega */
+.multiselect-container.show {
+    display: block;
+}
+
+/* Estilo para los elementos de la lista */
+.multiselect-container li {
+    display: flex;
+    align-items: center;
+    padding: 5px 0; /* Espaciado entre los elementos */
+    border-bottom: 1px solid #f0f0f0; /* Línea divisoria entre opciones */
+}
+
+/* Último elemento sin línea divisoria */
+.multiselect-container li:last-child {
+    border-bottom: none;
+}
+
+/* Checkbox y texto alineados */
+.multiselect-container input[type="checkbox"] {
+    margin-right: 10px; /* Espacio entre el checkbox y el texto */
+    width: 16px; /* Tamaño fijo del checkbox */
+    height: 16px;
+}
+
+/* Estilo para el texto de las opciones */
+.multiselect-container label {
+    font-size: 14px; /* Tamaño del texto */
+    color: #333; /* Color del texto */
+    margin: 0;
+}
+
+/* Estilo para el encabezado ("Seleccionar todo", etc.) */
+.multiselect-container .multiselect-all {
+    font-weight: bold;
+    color: #007bff; /* Color azul de Bootstrap */
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd; /* Separación clara */
+}
+
+/* Hover para las opciones */
+.multiselect-container li:hover {
+    background-color: #f8f9fa; /* Fondo claro al pasar el cursor */
+}
+
+/* Scrollbar estilizado */
+.multiselect-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.multiselect-container::-webkit-scrollbar-thumb {
+    background: #cccccc;
+    border-radius: 4px;
+}
+
+.multiselect-container::-webkit-scrollbar-thumb:hover {
+    background: #aaaaaa;
+}
+
+.multiselect-container button[type="button"] {
+    display: none; /* Oculta el botón */
+}
+
+
 /* Ajuste de la tabla en pantallas pequeñas */
 .table {
     width: 100%;
@@ -87,3 +235,182 @@ select[multiple] {
     height: auto; /* Ajustar altura del selector múltiple */
 }
 
+/* === Media Queries === */
+
+/* Pantallas pequeñas (max-width: 768px) */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 20px 5px;
+    }
+
+    .sidebar h2,
+    .sidebar ul li a span {
+        display: none;
+    }
+
+    .sidebar ul li a {
+        justify-content: center;
+    }
+
+    .container-fluid {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    header {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    .tabs {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tab-button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    #grafico-preview {
+        width: 90%;
+        margin: 0 auto; /* Mantener el gráfico centrado */
+    }
+
+    .table {
+        font-size: 0.85rem;
+        min-width: 100%;
+    }
+
+    .filter-section {
+        flex-direction: column; /* Apila los elementos verticalmente */
+        gap: 10px;
+    }
+
+    .filter-section .form-group {
+        width: 100%; /* Los elementos ocupan todo el ancho */
+    }
+
+    .filter-section button {
+        width: 100%; /* El botón ocupa todo el ancho disponible */
+        text-align: center;
+    }
+
+    /* Asegura que el menú de selección esté oculto por defecto */
+    .multiselect-container {
+        display: none; /* Ocultar por defecto */
+    }
+
+    /* Mostrar el contenedor de selección solo cuando esté activo */
+    .multiselect-container.show {
+        display: block; /* Mostrar cuando tenga la clase "show" */
+    }
+
+    .multiselect-container li {
+        margin-bottom: 5px;
+    }
+
+    .card h3 {
+        font-size: 1.5em; /* Reducir tamaño de fuente en pantallas pequeñas */
+        text-align: center; /* Centrar el texto para mejor visibilidad */
+    }
+
+    .exportar-btn-top-right {
+        top: 5px; /* Ajustar la posición superior para pantallas pequeñas */
+        right: 5px;
+    }
+}
+
+
+/* Pantallas medianas (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .container-fluid {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tab-button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    #grafico-preview {
+        width: 70%;
+        margin: 0 auto; /* Mantener el gráfico centrado */
+    }
+
+    .table {
+        font-size: 0.9rem;
+        min-width: 800px;
+    }
+
+    .filter-section {
+        flex-wrap: wrap; /* Ajusta los elementos en múltiples filas si es necesario */
+        gap: 15px;
+    }
+
+    .filter-section .form-group {
+        flex: 1 1 45%; /* Ocupa aproximadamente la mitad del ancho disponible */
+    }
+
+    .card h3 {
+        font-size: 1.8em; /* Ajustar el tamaño de fuente para pantallas medianas */
+        text-align: center; /* Centrar el texto para mantener un diseño consistente */
+    }
+
+    .exportar-btn-top-right {
+        top: 10px; /* Ajustar la posición superior */
+        right: 15px; /* Ajustar la posición derecha */
+    }
+}
+
+/* Pantallas grandes (min-width: 1025px) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+
+    .tabs {
+        flex-wrap: nowrap;
+    }
+
+    .tab-button {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    #grafico-preview {
+        width: 50%;
+        margin: 0 auto; /* Mantener el gráfico centrado */
+    }
+
+    .table {
+        font-size: 1rem;
+        min-width: 1200px;
+    }
+
+    .card h3 {
+        font-size: 2em; /* Tamaño de fuente para pantallas grandes */
+        text-align: left; /* Mantener el texto alineado a la izquierda para un aspecto profesional */
+    }
+
+    .exportar-btn-top-right {
+        top: 15px; /* Ajustar la posición superior */
+        right: 20px; /* Ajustar la posición derecha */
+    }
+}

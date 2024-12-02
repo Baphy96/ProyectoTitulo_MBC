@@ -20,29 +20,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const startDateInput = document.getElementById('startDate'); // Input para la fecha de inicio
     const endDateInput = document.getElementById('endDate'); // Input para la fecha de fin
     const buscarButton = document.getElementById('buscar'); // Botón de búsqueda
-    
- // Función para manejar cambios en los filtros
- function handleFilterChange() {
-    const startDate = startDateInput.value || null;
-    const endDate = endDateInput.value || null;
 
-    // Llamar a `loadCausas` con las fechas actualizadas
-    loadCausas(startDate, endDate);
-}
+    // Función para manejar cambios en los filtros
+    function handleFilterChange() {
+        const startDate = startDateInput.value || null;
+        const endDate = endDateInput.value || null;
 
-// Asignar eventos a los filtros
-startDateInput.addEventListener('change', handleFilterChange);
-endDateInput.addEventListener('change', handleFilterChange);
+        // Llamar a `loadCausas` con las fechas actualizadas
+        loadCausas(startDate, endDate);
+    }
 
-// Asignar evento al botón de búsqueda para ejecutar manualmente
-buscarButton.addEventListener('click', (event) => {
-    event.preventDefault(); // Prevenir comportamiento por defecto del formulario
-    const startDate = startDateInput.value || null;
-    const endDate = endDateInput.value || null;
+    // Asignar eventos a los filtros
+    startDateInput.addEventListener('change', handleFilterChange);
+    endDateInput.addEventListener('change', handleFilterChange);
 
-    // Llamar a `loadCausas` con las fechas actualizadas
-    loadCausas(startDate, endDate);
-});
+    // Asignar evento al botón de búsqueda para ejecutar manualmente
+    buscarButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir comportamiento por defecto del formulario
+        const startDate = startDateInput.value || null;
+        const endDate = endDateInput.value || null;
+
+        // Llamar a `loadCausas` con las fechas actualizadas
+        loadCausas(startDate, endDate);
+    });
 
 
 
@@ -83,6 +83,10 @@ buscarButton.addEventListener('click', (event) => {
 
         // Cambia el título del modal
         document.querySelector("#addCauseModal .modal-title").innerText = "Agregar Nueva Causa";
+
+        // Habilitar el campo cliente
+        document.getElementById('cliente').removeAttribute('disabled');
+
 
         // Muestra el modal utilizando Bootstrap
         $('#addCauseModal').modal('show');
@@ -381,6 +385,9 @@ buscarButton.addEventListener('click', (event) => {
                 // Asigna el ID de la causa al formulario para indicar que estamos en modo edición
                 newCauseForm.setAttribute('data-cause-id', id);
 
+                // Deshabilitar el campo cliente para evitar ediciones
+                document.getElementById('cliente').setAttribute('disabled', 'true');
+
                 // Cargar opciones de listas desplegables antes de establecer valores
                 await loadDropdownOptions();
                 document.querySelector("#addCauseModal h5").innerText = `Editar Causa Rol ${causa.rol}`;
@@ -404,7 +411,15 @@ buscarButton.addEventListener('click', (event) => {
 
                 // Cargar y asignar datos de los honorarios si existen
                 const honorariosSnapshot = await getDocs(query(collection(db, "honorarios"), where("rol", "==", causa.rol)));
+
                 if (!honorariosSnapshot.empty) {
+                    // Detectar múltiples registros para el mismo rol
+                    if (honorariosSnapshot.docs.length > 1) {
+                        console.warn(`Se encontraron múltiples honorarios para el rol: ${causa.rol}`);
+                        alert(`Advertencia: Se encontraron múltiples registros de honorarios para el rol ${causa.rol}. Usando el primero encontrado.`);
+                    }
+
+                    // Usar el primer registro encontrado
                     const honorariosData = honorariosSnapshot.docs[0].data();
                     const honorariosId = honorariosSnapshot.docs[0].id;
 
@@ -417,6 +432,11 @@ buscarButton.addEventListener('click', (event) => {
 
                     // Guardar el ID de honorarios en el formulario para actualizarlo después
                     honorariosForm.setAttribute('data-honorario-id', honorariosId);
+                } else {
+                    console.warn("No se encontraron honorarios para el rol actual.");
+                    alert("No se encontraron honorarios asociados a esta causa. Puede que sean nuevos o hayan sido eliminados.");
+                    honorariosForm.reset();
+                    honorariosForm.setAttribute('data-honorario-id', ""); // Limpiar cualquier referencia previa
                 }
             } else {
                 console.log("No se encontró la causa con el ID proporcionado.");
@@ -428,7 +448,8 @@ buscarButton.addEventListener('click', (event) => {
         }
     };
 
-    // Función para guardar los cambios de la edición
+
+
     // Función para guardar los cambios de la edición o agregar una nueva causa
     newCauseForm.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -465,7 +486,22 @@ buscarButton.addEventListener('click', (event) => {
 
         try {
             if (id) {
-                // Actualizar la causa existente si hay un ID
+                // Aquí agregamos el código para eliminar honorarios con el rol antiguo
+                const oldCauseDoc = await getDoc(doc(db, "causas", id));
+                const oldCauseData = oldCauseDoc.data();
+
+                if (oldCauseData && oldCauseData.rol !== updatedCause.rol) {
+                    const honorariosRef = collection(db, "honorarios");
+                    const oldHonorariosSnapshot = await getDocs(query(honorariosRef, where("rol", "==", oldCauseData.rol)));
+
+                    if (!oldHonorariosSnapshot.empty) {
+                        for (const doc of oldHonorariosSnapshot.docs) {
+                            await deleteDoc(doc.ref); // Eliminar cada honorario relacionado con el rol antiguo
+                        }
+                    }
+                }
+
+                // Actualizar la causa existente
                 const causeRef = doc(db, "causas", id);
                 await updateDoc(causeRef, updatedCause);
                 alert("Causa actualizada con éxito.");
@@ -486,9 +522,21 @@ buscarButton.addEventListener('click', (event) => {
                 const querySnapshot = await getDocs(query(honorariosRef, where("rol", "==", honorariosTemporales.rol)));
 
                 if (!querySnapshot.empty) {
-                    // Actualizar los honorarios existentes
+                    if (querySnapshot.docs.length > 1) {
+                        console.warn(`Se encontraron múltiples registros de honorarios para el rol: ${honorariosTemporales.rol}`);
+                        alert(`Advertencia: Se encontraron múltiples registros para el rol ${honorariosTemporales.rol}. Actualizando el primero.`);
+                    }
+
+                    // Actualizar el primer honorario encontrado
                     const honorarioDoc = querySnapshot.docs[0];
                     await updateDoc(honorarioDoc.ref, honorariosTemporales);
+
+                    // Opcional: Eliminar otros duplicados (si existen)
+                    if (querySnapshot.docs.length > 1) {
+                        for (let i = 1; i < querySnapshot.docs.length; i++) {
+                            await deleteDoc(querySnapshot.docs[i].ref);
+                        }
+                    }
                 } else {
                     // Agregar nuevos honorarios
                     await addDoc(honorariosRef, honorariosTemporales);
@@ -507,9 +555,12 @@ buscarButton.addEventListener('click', (event) => {
             console.error("Error al actualizar la causa y/o honorarios:", e);
             alert("Hubo un error al actualizar la causa y/o honorarios. Por favor, intente de nuevo.");
         }
+
+        // Recargar la tabla de honorarios para reflejar los cambios
+        if (typeof loadHonorarios === 'function') {
+            await loadHonorarios();
+        }
     });
-
-
 
 
 
@@ -613,9 +664,6 @@ buscarButton.addEventListener('click', (event) => {
         const rutCliente = clienteElement.value;
         const nombreCliente = clienteElement.options[clienteElement.selectedIndex]?.text || "";
 
-
-
-
         // Capturar los valores de los campos del formulario de honorarios
         honorariosTemporales = {
             rol: document.getElementById('rolHonorarios').value,
@@ -638,6 +686,15 @@ buscarButton.addEventListener('click', (event) => {
         $('#honorariosModal').modal('hide');
         honorariosForm.reset();
     }
+
+    // Recalcular y recargar honorarios al cerrar el modal
+    $('#honorariosModal').on('hidden.bs.modal', async function () {
+        if (typeof loadHonorarios === 'function') {
+            await loadHonorarios(); // Recargar la tabla de honorarios al cerrar el modal
+        }
+    });
+
+
 
     // Función para formatear número con separadores de miles
     function formatNumberWithThousandSeparator(value) {
@@ -673,14 +730,14 @@ buscarButton.addEventListener('click', (event) => {
 
             for (const causaDoc of causasSnapshot.docs) {
                 const causaData = causaDoc.data();
-    
+
                 // Formatea la fecha en dd-mm-aa
                 const fecha = causaData.fechaIngreso
                     ? new Date(causaData.fechaIngreso).toLocaleDateString("es-CL", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric", // Mostrar año completo (2024 en lugar de 24)
-                      })
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric", // Mostrar año completo (2024 en lugar de 24)
+                    })
                     : "N/A";
 
                 // Obtener datos de honorarios asociados

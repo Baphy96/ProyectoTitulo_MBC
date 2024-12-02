@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/eventos.css">
+</head>
+
+<body>
+    <!-- Contenedor de la barra lateral -->
+    <div id="sidebar-container"></div>
+
+    <!-- Contenido principal -->
+    <div class="container-fluid">
+        <header class="text-center">
+            <h1>Eventos</h1>
+        </header>
+
+        <!-- Botones para agregar y editar eventos -->
+        <div class="d-flex justify-content-center my-3">
+            <button class="btn btn-primary mr-2" id="addEventButton">Agregar Evento</button>
+
+        </div>
+
+        <!-- Contenedor para notificaciones emergentes -->
+        <div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+            <div id="toastContainer" class="toast-container">
+                <!-- Los toasts dinámicos se agregarán aquí mediante JavaScript -->
+            </div>
+        </div>
+
+        <!-- Calendario -->
+        <div class="row">
+            <div class="col-md-8">
+                <div id="calendar" class="border rounded"></div>
+            </div>
+
+            <!-- Tabla resumen -->
+            <div class="col-md-4">
+                <h5 class="text-center">Resumen de Eventos</h5>
+
+                <!-- Filtro de período -->
+                <div class="mb-3">
+                    <form id="filterForm">
+                        <div class="form-group">
+                            <label for="filterStartDate">Desde:</label>
+                            <input type="date" id="filterStartDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterEndDate">Hasta:</label>
+                            <input type="date" id="filterEndDate" class="form-control">
+                        </div>
+                        <button type="button" id="applyFilterButton"
+                            class="btn btn-primary btn-block mt-2">Filtrar</button>
+                    </form>
+                </div>
+
+                <!-- Tabla de eventos -->
+                <table id="eventSummaryTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Evento</th>
+                            <th>ROL / Año</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventSummary">
+                        <!-- Aquí se llenarán los eventos dinámicamente -->
+                    </tbody>
+                </table>
+                
+            <!-- Modal para agregar evento -->
+            <div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addEventModalLabel">Agregar Evento</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addEventForm">
+                                <div class="form-group">
+                                    <label for="eventDate">Fecha</label>
+                                    <input type="date" class="form-control" id="eventDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventType">Tipo de evento</label>
+                                    <select class="form-control" id="eventType" required>
+                                        <option value="" disabled selected>Seleccione</option>
+                                        <option value="audiencia">Fecha de Audiencia</option>
+                                        <option value="reunion">Reunión</option>
+                                        <option value="plazo">Vencimiento de Plazo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventRole">ROL / Año</label>
+                                    <select class="form-control" id="eventRole" required>
+                                        <option value="" disabled selected>Seleccione</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventDescription">Descripción</label>
+                                    <textarea class="form-control" id="eventDescription" rows="3"
+                                        placeholder="Detalles del evento"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="saveEventButton">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para editar evento -->
+            <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog"
+                aria-labelledby="editEventModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editEventModalLabel">Editar Evento</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editEventForm">
+                                <input type="hidden" id="editEventId"> <!-- Campo oculto para el ID del evento -->
+                                <div class="form-group">
+                                    <label for="editEventDate">Fecha</label>
+                                    <input type="date" class="form-control" id="editEventDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editEventType">Tipo de evento</label>
+                                    <select class="form-control" id="editEventType" required>
+                                        <option value="Audiencia">Fecha de Audiencia</option>
+                                        <option value="Reunion">Reunión</option>
+                                        <option value="Plazo">Vencimiento de Plazo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editEventRole">ROL / Año</label>
+                                    <input type="text" class="form-control" id="editEventRole" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editEventDescription">Descripción</label>
+                                    <textarea class="form-control" id="editEventDescription" rows="3"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" id="deleteEventButton">Eliminar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="updateEventButton">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scripts -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/index.global.min.js"></script>
+            <script src="../scripts/sidebar.js" defer></script>
+            <script src="../scripts/eventos.js" type="module"></script>
+
+</body>
+
+</html>

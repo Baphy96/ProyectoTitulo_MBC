@@ -38,22 +38,25 @@
             <section id="entidades" class="tab-content active">
                 <h2>Entidades</h2>
                 <button id="addEntity" class="add-button">Agregar Nuevo</button>
-                <table id="entityTable">
-                    <thead>
-                        <tr>
-                            <th>RUT</th>
-                            <th>Nombre o Razón Social</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>Correo</th>
-                            <th>Tipo de Entidad</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="entityTableBody">
-                        <!-- Resultados de entidades se mostrarán aquí -->
-                    </tbody>
-                </table>
+                <!-- Contenedor de tabla responsiva -->
+                <div class="table-responsive">
+                    <table id="entityTable">
+                        <thead>
+                            <tr>
+                                <th>RUT</th>
+                                <th>Nombre o Razón Social</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Correo</th>
+                                <th>Tipo de Entidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entityTableBody">
+                            <!-- Resultados de entidades se mostrarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
             <section id="tipos-servicio" class="tab-content">
@@ -76,6 +79,7 @@
             <section id="tribunales" class="tab-content">
                 <h2>Tribunales</h2>
                 <button id="addCourt" class="add-button">Agregar Nuevo Tribunal</button>
+                <div class="table-responsive">
                 <table id="courtTable">
                     <thead>
                         <tr>
@@ -88,6 +92,7 @@
                         <!-- Resultados de tribunales se mostrarán aquí -->
                     </tbody>
                 </table>
+            </div>
             </section>
 
             <section id="estados" class="tab-content">

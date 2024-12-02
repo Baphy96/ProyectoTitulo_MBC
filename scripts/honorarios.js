@@ -30,15 +30,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch de datos de honorarios desde Firebase
     async function fetchHonorarios() {
         const snapshot = await getDocs(collection(db, "honorarios"));
-        const honorarios = snapshot.docs.map(doc => ({
-            id: doc.id, // Incluye el ID del documento
-            ...doc.data(),
-        }));
+    const honorarios = snapshot.docs.map(doc => ({
+        id: doc.id, // Incluye el ID del documento
+        ...doc.data(),
+    }));
 
-        console.log("Datos obtenidos de Firebase:", honorarios);
+     // Agrega este log para verificar las fechas recuperadas
+     honorarios.forEach(honorario => {
+        console.log("Fecha recuperada:", honorario.fechaDocumento);
+    });
 
-        return honorarios;
+    
+    // Eliminar duplicados basados en el rol
+    const uniqueHonorarios = [];
+    const seenRoles = new Set();
+    let duplicatesCount = 0;
+
+    for (const honorario of honorarios) {
+        if (!seenRoles.has(honorario.rol)) {
+            seenRoles.add(honorario.rol);
+            uniqueHonorarios.push(honorario);
+        } else {
+            duplicatesCount++;
+            console.warn(`Honorario duplicado encontrado y excluido: Rol ${honorario.rol}`);
+        }
     }
+
+    console.log(`Datos obtenidos de Firebase: ${honorarios.length} honorarios.`);
+    console.log(`Duplicados eliminados: ${duplicatesCount}`);
+    console.log("Datos únicos procesados:", uniqueHonorarios);
+
+    return uniqueHonorarios;
+}
 
     // Filtrar los honorarios según los filtros aplicados
     function applyFilters(honorarios, filters) {
@@ -58,10 +81,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const saldo = parseFloat(honorario.monto || 0) - totalPagos;
 
             // Filtro por tipo
-            if (tipo === "pendientes" && saldo === 0) {
+            if (tipo === "pendientes" && saldo <= 0) {
                 return false;
             }
-            if (tipo === "pagadas" && saldo > 0) {
+            if (tipo === "pagadas" && saldo !== 0) {
                 return false;
             }
 
@@ -80,15 +103,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // Agrupar honorarios por rutCliente
     function groupHonorariosByClient(honorarios) {
         return honorarios.reduce((groups, item) => {
-            const { rutCliente } = item;
-            if (!groups[rutCliente]) {
-                groups[rutCliente] = [];
+            const { rutCliente, rol } = item;
+    
+            // Manejar honorarios sin un rutCliente válido
+            const clienteKey = rutCliente || "Sin RUT";
+    
+            if (!groups[clienteKey]) {
+                groups[clienteKey] = [];
             }
-            groups[rutCliente].push(item);
+    
+            // Evitar duplicados dentro del mismo grupo
+            if (!groups[clienteKey].some(h => h.rol === rol)) {
+                groups[clienteKey].push(item);
+            }
+    
             return groups;
         }, {});
     }
-
+    
     // Renderizar la tabla con los honorarios
     function renderHonorariosTable(groupedHonorarios, tableId) {
         let rows = "";
@@ -137,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    
     // Calcular subtotales de un grupo de honorarios
     function calculateGroupSubtotals(group) {
         let subtotalMonto = 0;
@@ -154,14 +187,11 @@ document.addEventListener("DOMContentLoaded", function () {
             subtotalAbono += totalAbonos;
             subtotalSaldo += saldo;
 
-            const fecha = data.fechaDocumento
-                ? new Date(data.fechaDocumento).toLocaleDateString("es-CL", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                })
-                : "N/A";
-
+           // Aquí aplicamos la modificación para procesar correctamente la fecha
+        const fecha = data.fechaDocumento
+        ? data.fechaDocumento.split("-").reverse().join("-") // Convierte 'YYYY-MM-DD' a 'DD-MM-YYYY'
+        : "N/A";
+        
             groupRows += `
                 <tr>
                 <td>${data.rutCliente || "N/A"}</td>
@@ -296,6 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#paymentModal").modal("show");
     };
 
+    
     // Actualizar el total a pagar
     function updateTotalPago() {
         const rows = document.querySelectorAll("#paymentTableBody tr");

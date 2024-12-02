@@ -165,26 +165,30 @@
                       </button>
                     </div>
                     <div class="modal-body">
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Fecha de Pago</th>
-                            <th>Tipo de Pago</th>
-                            <th>Monto</th>
-                            <th>N.° Documento</th>
-                            <th>Acciones</th>
-                          </tr>
-                        </thead>
-                        <tbody id="editPaymentTableBody"></tbody>
-                      </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha de Pago</th>
+                                        <th>Tipo de Pago</th>
+                                        <th>Monto</th>
+                                        <th>N.º Documento</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editPaymentTableBody">
+                                    <!-- Contenido dinámico generado con JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" id="saveEditedPayments">Guardar Cambios</button>
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="saveEditedPayments">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     </div>
-                  </div>
                 </div>
-              </div>
+            </div>
+        </div>
               
     <!-- Scripts de Firebase y funciones -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,0 +1,327 @@
+/* Estilos generales de la página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Contenedor principal */
+.container-fluid {
+    padding: 0 15px;
+    margin-left: 250px;
+    /* Asegura espacio para la barra lateral */
+    width: calc(100% - 250px);
+    /* Ocupa el espacio restante */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+
+}
+
+/* Encabezado */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px 20px;
+    /* Reducir el padding para ahorrar espacio */
+    text-align: center;
+    width: 100%;
+    /* Reducir el ancho horizontal */
+}
+
+
+.tooltip-event {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    z-index: 1000;
+    pointer-events: none;
+    /* Evita interferencias con el mouse */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+    max-width: 250px;
+    /* Limita el ancho máximo */
+    word-wrap: break-word;
+    /* Permite dividir palabras largas */
+}
+
+/* Notificación emergente */
+.toast-container {
+    position: fixed;
+    /* Asegura que permanezca fija en la pantalla */
+    top: 50%;
+    /* Centrado vertical */
+    left: 50%;
+    /* Centrado horizontal */
+    transform: translate(-50%, -50%);
+    /* Ajuste de la posición */
+    z-index: 1050;
+    /* Asegura que esté sobre otros elementos */
+    max-width: 90%;
+    /* Evita que sea demasiado grande en pantallas pequeñas */
+    display: flex;
+    /* Centrado adicional para su contenido */
+    align-items: center;
+    justify-content: center;
+}
+
+.toast {
+    width: 800px;
+    /* Ajustar tamaño */
+    max-width: 100%;
+    /* Garantiza que no desborde en pantallas pequeñas */
+    font-size: 1.2rem;
+    /* Tamaño del texto */
+    padding: 1rem;
+    /* Espaciado interno */
+    border-radius: 0.5rem;
+    /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Sombra para darle profundidad */
+    background-color: #fff;
+    /* Fondo blanco por defecto */
+    position: relative;
+}
+
+.toast-body {
+    text-align: center;
+    /* Centrar contenido */
+    padding: 0.5rem 1rem;
+    /* Espaciado adicional */
+    color: #333;
+    /* Color del texto */
+}
+
+/* Estilo para el botón de cierre en el Toast */
+.toast .close {
+    position: absolute;
+    top: 10px;
+    /* Ajusta la distancia desde la parte superior */
+    right: 10px;
+    /* Ajusta la distancia desde la parte derecha */
+    padding: 0;
+    font-size: 1.5rem;
+    /* Tamaño de la "X" */
+    color: #aaa;
+    /* Color del botón */
+    border: none;
+    /* Sin bordes */
+    background: none;
+    /* Fondo transparente */
+    cursor: pointer;
+    /* Manita al pasar el mouse */
+    line-height: 1;
+}
+
+.toast .close:hover {
+    color: #000;
+    /* Cambia de color al pasar el mouse */
+}
+
+/* Barra de desplazmiento  */
+.table-container {
+    overflow-x: auto;
+    /* Permitir desplazamiento horizontal */
+    max-height: calc(5 * 50px);
+    /* Limitar la altura máxima si hay muchas filas */
+    border: 1px solid #ddd;
+    /* Opcional: añadir borde */
+    margin: 1rem 0;
+    /* Espaciado opcional */
+}
+
+.table-container table {
+    width: 100%;
+    /* Asegura que la tabla ocupe todo el contenedor */
+    border-collapse: collapse;
+    /* Quita espacios entre celdas */
+}
+
+.table-container th,
+.table-container td {
+    text-align: center;
+    /* Centrar contenido */
+    padding: 8px;
+    /* Espaciado interno */
+    border: 1px solid #ddd;
+    /* Borde entre celdas */
+}
+
+/* Colores para los eventos según su tipo */
+.event-audiencia {
+    background-color: #f38585 !important;
+    /* Rojo claro */
+    color: #000 !important;
+    /* Texto negro */
+    border: none !important;
+}
+
+.event-reunion {
+    background-color: #7fb9f7 !important;
+    /* Azul claro */
+    color: #000 !important;
+    /* Texto negro */
+    border: none !important;
+}
+
+.event-plazo {
+    background-color: #8befa3 !important;
+    /* Verde claro */
+    color: #000 !important;
+    /* Texto negro */
+    border: none !important;
+}
+
+.event-default {
+    background-color: #f8f9fa !important;
+    /* Gris claro */
+    color: #000 !important;
+    /* Texto negro */
+    border: none !important;
+}
+
+/* Eventos pasados en gris */
+.event-past {
+    background-color: #e9ecef !important;
+    /* Gris más oscuro */
+    color: #6c757d !important;
+    /* Texto gris */
+    border: none !important;
+    text-decoration: line-through !important;
+    /* Marcar como pasado */
+    pointer-events: none !important;
+    /* Desactivar clic */
+}
+
+
+/* === Media Queries === */
+
+/* Pantallas pequeñas (max-width: 768px) */
+@media (max-width: 768px) {
+
+    /* Ajustes para la barra lateral */
+    .sidebar {
+        width: 60px;
+        padding: 20px 5px;
+    }
+
+    .sidebar h2,
+    .sidebar ul li a span {
+        display: none;
+        /* Oculta texto y título */
+    }
+
+    .sidebar ul li a {
+        justify-content: center;
+    }
+
+    .container-fluid {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+        /* Ajusta el margen para la barra lateral colapsada */
+    }
+
+    /* Encabezado */
+    header {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    /* Tooltip de eventos */
+    .tooltip-event {
+        font-size: 0.8em;
+        /* Reduce el tamaño de fuente */
+        max-width: 200px;
+        /* Limita aún más el ancho */
+        padding: 6px;
+        /* Reduce el padding */
+    }
+
+    /* Ajustes para notificación emergente */
+    .toast {
+        width: 90%;
+        /* Reduce el ancho en pantallas pequeñas */
+        font-size: 1rem;
+        /* Disminuye el tamaño de la fuente */
+    }
+
+    .toast-container {
+        top: auto;
+        /* Ajusta la posición */
+        bottom: 10px;
+        /* Mueve la notificación a la parte inferior */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Pantallas medianas (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    /* Barra lateral tamaño intermedio */
+    .sidebar {
+        width: 200px;
+    }
+
+    .container-fluid {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    /* Tooltip de eventos */
+    .tooltip-event {
+        font-size: 0.9em;
+        /* Tamaño estándar */
+        max-width: 250px;
+        padding: 8px;
+    }
+
+    /* Ajustes para notificación emergente */
+    .toast {
+        width: 600px;
+        /* Ajusta el ancho */
+        font-size: 1.1rem;
+        /* Fuente intermedia */
+    }
+
+    .toast-container {
+        top: 50%;
+        /* Centrado vertical */
+        bottom: auto;
+        /* Reinicia el ajuste de pantallas pequeñas */
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Pantallas grandes (min-width: 1025px) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+
+    .tooltip-event {
+        font-size: 0.9em;
+        /* Mantiene el tamaño estándar */
+        max-width: 250px;
+        padding: 8px;
+    }
+
+    /* Ajustes para notificación emergente */
+    .toast {
+        width: 800px;
+        /* Tamaño grande */
+        font-size: 1.2rem;
+        /* Tamaño del texto mayor */
+    }
+
+    .toast-container {
+        top: 50%;
+        /* Centrado vertical */
+        bottom: auto;
+        transform: translate(-50%, -50%);
+    }
+}

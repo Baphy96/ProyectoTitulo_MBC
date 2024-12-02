@@ -10,6 +10,7 @@ body {
     padding: 0 15px;
     margin-left: 250px; /* Asegura espacio para la barra lateral */
     width: calc(100% - 250px); /* Ocupa el espacio restante */   
+    transition: margin-left 0.3s ease, width 0.3s ease;
         
 }
 
@@ -112,7 +113,7 @@ tbody tr:hover {
 /* Tabla de Resultados */
 .table-responsive {    
     width: 100%; /* Asegura que la tabla se expanda en todo el contenedor */
-    overflow-x: visible; /* Para que la tabla no tenga barra de desplazamiento horizontal */
+    overflow-x: auto; /* Para que la tabla tenga barra de desplazamiento horizontal */
     
 }
 
@@ -123,75 +124,170 @@ tbody tr:hover {
     text-align: left; /* Alineación del texto a la izquierda para mejor legibilidad */
 }
 
-/* Ajuste del ancho máximo de las celdas para pantallas grandes */
-@media (min-width: 1200px) {
-    .table-responsive th, .table-responsive td {
-        padding: 5px; /* Dar más espacio a las celdas en pantallas grandes */
-    }
+/* === Modal de Edición de Pagos === */
+
+/* Ajustar el tamaño del modal */
+.modal-dialog.modal-lg {
+    max-width: 50%; /* Limitar el ancho máximo en pantallas grandes */
+    width: 100%; /* Asegurar que ocupe el ancho disponible */
 }
 
-/* Ajuste para pantallas pequeñas */
+.modal-content {
+    padding: 15px;
+    overflow-x: hidden; /* Evitar desbordamientos horizontales */
+    border-radius: 8px; /* Bordes redondeados para diseño moderno */
+}
+
+/* Tabla dentro del modal */
+.modal-body .table {
+    width: 100%; /* Asegurar que la tabla ocupe todo el ancho disponible */
+    margin-bottom: 15px;
+    border-collapse: collapse; /* Eliminar bordes dobles */
+    overflow-x: auto; /* Activar desplazamiento horizontal si es necesario */
+}
+
+.modal-body .table th,
+.modal-body .table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+    font-size: 0.9rem; /* Tamaño de fuente ajustado */
+    box-sizing: border-box;
+}
+
+/* Inputs y selects dentro de la tabla */
+.modal-body .table input[type="text"],
+.modal-body .table input[type="number"],
+.modal-body .table input[type="date"],
+.modal-body .table select {
+    width: 100%; /* Ocupa todo el ancho de la celda */
+    padding: 5px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+/* Botón de acción dentro de la tabla */
+.modal-body .table button {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    text-align: center;
+}
+
+
+/* === Media Queries === */
+
+/* Pantallas pequeñas (max-width: 768px) */
 @media (max-width: 768px) {
-    .table-responsive td, .table-responsive th {
-        font-size: 0.8em; /* Reducir el tamaño de letra en pantallas pequeñas */
-        padding: 6px 8px; /* Reducir el padding para hacer la tabla más compacta */
+    /* Ajustes en la barra lateral */
+    .sidebar {
+        width: 60px;
+        padding: 20px 5px;
     }
 
-    .table-responsive {
-        overflow-x: auto; /* Añadir desplazamiento horizontal en pantallas pequeñas */
-    }   
-}
-
-
-
-/* Ajuste para pantallas más grandes */
-@media (min-width: 1200px) {
-    .content {
-        max-width: 1600px; /* Más ancho para pantallas muy grandes */
-        padding: 30px; /* Añadir un poco más de espacio alrededor */
-    }
-}
-
-/* Ajuste del margen izquierdo del contenido para pantallas más pequeñas */
-@media (max-width: 768px) {
-    .content {
-        margin-left: 250px; /* Elimina el margen izquierdo en pantallas pequeñas */
-        padding: 10px; /* Reduce el padding para optimizar espacio */
-    }
-}
-
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 768px) {
-    .content {
-        margin-left: 0; /* Elimina el margen izquierdo en pantallas pequeñas */
-        width: 100%; /* Usa todo el ancho */
-        padding: 10px; /* Espaciado compacto */
-        
+    .sidebar h2,
+    .sidebar ul li a span {
+        display: none; /* Oculta el texto y título */
     }
 
-    .table-responsive {
-        overflow-x: auto; /* Habilitar scroll horizontal si es necesario */
+    .sidebar ul li a {
+        justify-content: center;
+    }
+
+    .container-fluid {
+        margin-left: 60px;
+        width: calc(100% - 60px); /* Ajusta el margen para barra lateral colapsada */
+    }
+
+    /* Encabezado */
+    header {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    /* Filtros */
+    .filter-section {
+        flex-direction: column; /* Filtros en una sola columna */
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .filter-section .form-group {
+        width: 100%; /* Los filtros ocupan todo el ancho */
+    }
+
+    .filter-section button {
+        width: 100%; /* Botones ocupan todo el ancho */
     }
 
     table {
-        font-size: 0.85rem; /* Reducir tamaño de fuente */
+        font-size: 0.85rem; /* Tamaño de fuente menor para pantallas pequeñas */
     }
 
-    th, td {
-        padding: 8px; /* Reducir padding */
+    .modal-dialog.modal-lg {
+        max-width: 95%; /* Ancho máximo más reducido */
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-body .table th,
+    .modal-body .table td {
+        font-size: 0.8rem; /* Reducir el tamaño de fuente en pantallas pequeñas */
+    }
+
+    .modal-body .table input,
+    .modal-body .table select {
+        font-size: 0.8rem; /* Reducir el tamaño de los inputs */
+        padding: 4px;
+    }
+
+    .modal-footer .btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 }
 
-/* Ajustes para pantallas grandes */
-@media (min-width: 1200px) {
-    .content {
-        max-width: calc(100% - 250px); /* Asegura que el contenido no se desborde */
-        padding: 30px; /* Añadir espacio adicional */
-        
+/* Pantallas medianas (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Barra lateral tamaño intermedio */
+    .sidebar {
+        width: 200px;
+    }
+
+    .container-fluid {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .filter-section {
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     table {
-        max-width: 100%; /* Evitar restricciones de ancho */
+        font-size: 0.9rem; /* Tamaño de fuente estándar */
+    }
+
+    .modal-dialog.modal-lg {
+        max-width: 90%;
+    }
+
+    .modal-body .table th,
+    .modal-body .table td {
+        font-size: 0.85rem; /* Tamaño intermedio de fuente */
     }
 }
 
+/* Pantallas grandes (min-width: 1025px) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+}
