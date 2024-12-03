@@ -3,56 +3,22 @@ import { checkUserRole } from './roleManager.js';
 document.addEventListener('DOMContentLoaded', function () {
     // Verificar el rol del usuario y manejar los módulos visibles
     checkUserRole();
-
-    // Mostrar/ocultar el menú desplegable
-    const dropdownToggle = document.getElementById('dropdown-toggle');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function () {
-            dropdownMenu.classList.toggle('show');
-        });
-
-        // Cerrar el menú si se hace clic fuera de él
-        window.addEventListener('click', function (event) {
-            if (!event.target.matches('#dropdown-toggle') && !event.target.closest('.user-info')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-    }
-
-    // Redirección para los botones de "Salir" y "Cerrar sesión"
-    const logoutButton = document.getElementById('logout');
-    const logoutSession = document.getElementById('logout-session');
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function () {
-            // Eliminar el rol del localStorage para cerrar sesión
-            localStorage.removeItem('userRole');
-            window.location.href = "../index.html"; // Redirigir al inicio de sesión
-        });
-    }
-
-    if (logoutSession) {
-        logoutSession.addEventListener('click', function () {
-            // Eliminar el rol del localStorage para cerrar sesión
-            localStorage.removeItem('userRole');
-            window.location.href = "../index.html"; // Redirigir al inicio de sesión
-        });
-    }
-
-    // Ocultar o mostrar los módulos del menú según el rol del usuario
-    manageMenuVisibility();
+    manageMenuVisibility(); // Mostrar módulos según el rol
+    setupDropdownMenu(); // Configurar el menú desplegable
+    setupLogoutButtons(); // Configurar botones de cierre de sesión
 });
 
+// Función para manejar la visibilidad de los módulos según el rol del usuario
 function manageMenuVisibility() {
     const userRole = localStorage.getItem('userRole');
 
     if (!userRole) {
-        alert("No se encontró el rol del usuario. Redirigiendo...");
+        console.error("No se encontró el rol del usuario. Redirigiendo...");
         window.location.href = "../index.html";
         return;
     }
+
+    console.log("Rol del usuario detectado:", userRole);
 
     // Definir módulos visibles para cada rol
     const roleModules = {
@@ -60,8 +26,7 @@ function manageMenuVisibility() {
             "main-gestion-causas",
             "main-honorarios",
             "main-eventos",
-            "main-reportes",
-            "main-mantendores"
+            "main-reportes"
         ],
         "Asistente Administrativo": [
             "main-gestion-causas",
@@ -82,16 +47,58 @@ function manageMenuVisibility() {
         module.style.display = "none";
     });
 
-    // Mostrar solo los módulos permitidos para el rol
+    // Mostrar solo los módulos permitidos para el rol actual
     if (roleModules[userRole]) {
         roleModules[userRole].forEach(moduleId => {
             const module = document.getElementById(moduleId);
             if (module) {
                 module.style.display = "block";
+            } else {
+                console.warn(`No se encontró el módulo con ID: ${moduleId}`);
             }
         });
     } else {
-        alert("Acceso no autorizado.");
+        console.error("Acceso no autorizado para el rol:", userRole);
         window.location.href = "../index.html";
+    }
+}
+
+// Configuración del menú desplegable
+function setupDropdownMenu() {
+    const dropdownToggle = document.getElementById('dropdown-toggle');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (dropdownToggle && dropdownMenu) {
+        dropdownToggle.addEventListener('click', function () {
+            dropdownMenu.classList.toggle('show');
+        });
+
+        // Cerrar el menú si se hace clic fuera de él
+        window.addEventListener('click', function (event) {
+            if (!event.target.matches('#dropdown-toggle') && !event.target.closest('.user-info')) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    } else {
+        console.warn("No se encontró el menú desplegable o su botón de activación.");
+    }
+}
+
+// Configuración de los botones de cerrar sesión
+function setupLogoutButtons() {
+    const logoutButton = document.getElementById('logout');
+    const logoutSession = document.getElementById('logout-session');
+
+    const handleLogout = () => {
+        localStorage.removeItem('userRole'); // Eliminar el rol almacenado
+        window.location.href = "../index.html"; // Redirigir al inicio de sesión
+    };
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', handleLogout);
+    }
+
+    if (logoutSession) {
+        logoutSession.addEventListener('click', handleLogout);
     }
 }

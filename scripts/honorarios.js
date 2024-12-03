@@ -6,10 +6,53 @@ document.addEventListener('DOMContentLoaded', function () {
   // Verificar el rol del usuario y manejar los módulos visibles
   checkUserRole();
 
+});
+
+// Verificar el rol del usuario
+const userRole = localStorage.getItem("userRole");
+console.log("Rol del usuario en Honorarios:", userRole);
+
+// Mostrar alerta si el usuario no tiene acceso al módulo
+if (userRole !== "Administrador" && userRole !== "Asistente Administrativo" && userRole !== "Abogado") {
+    alert("No tienes permiso para acceder a este módulo.");
+    window.location.href = "/unauthorized.html"; // Opcional: redirigir a una página de acceso denegado
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const resultsTableBody = document.getElementById("resultsTableBody");
     const searchForm = document.getElementById("searchForm");
+    
+// Función para manejar restricciones de acceso según el rol del usuario
+function applyRolePermissions() {
+    if (userRole === "Abogado") {
+        // Desactivar el botón de Pagar en los subtotales
+        const payButtons = document.querySelectorAll(".btn-success");
+        payButtons.forEach(button => {
+            button.disabled = true;
+            button.style.pointerEvents = "none";
+            button.classList.add("disabled");
+            console.log("Botón de 'Pagar' deshabilitado para el rol 'Abogado'.");
+        });
 
+        // Desactivar el botón de Guardar Cambios en el modal de edición
+        const editButton = document.querySelector("#saveEditedPayments");
+        if (editButton) {
+            editButton.disabled = true;
+            editButton.style.pointerEvents = "none";
+            editButton.classList.add("disabled");
+            console.log("Botón de 'Guardar Cambios' deshabilitado para el rol 'Abogado'.");
+        }
+
+        // Opcional: Ocultar botones de agregar o realizar otras restricciones
+        const addButtons = document.querySelectorAll(".btn-agregar");
+        addButtons.forEach(button => {
+            button.style.display = "none";
+        });
+    }
+}
+
+// Llamar a la función para aplicar restricciones de rol al cargar el contenido
+applyRolePermissions();
 
     let filters = {}; // Almacena los filtros activos
     let honorarioGroups = [];
@@ -153,8 +196,12 @@ document.addEventListener("DOMContentLoaded", function () {
             <td>${formatCurrency(subtotalAbono)}</td>
             <td>${formatCurrency(subtotalSaldo)}</td>
             <td>            
-            <button class="btn btn-success" onclick="openPaymentModal('${rutCliente}', '${nombreCliente}', ${groupIndex})">💲Pagar </button>
-            </td>
+        ${
+            userRole !== "Abogado"
+                ? `<button class="btn btn-success" onclick="openPaymentModal('${rutCliente}', '${nombreCliente}', ${groupIndex})">💲Pagar</button>`
+                : `<button class="btn btn-success" disabled style="pointer-events: none;">💲Pagar</button>`
+        }
+    </td>
         </tr>
         `;
 
@@ -208,9 +255,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${formatCurrency(monto)}</td>
                 <td>${formatCurrency(totalAbonos)}</td>
                 <td>${formatCurrency(saldo)}</td>
-                <td>    
-        <button class="btn btn-primary btn-sm" onclick="editPayment('${data.id}')">✏️</button>        
-    </td>
+                <td>  
+                ${
+                    userRole !== "Abogado"
+                        ? `<button class="btn btn-primary btn-sm" onclick="editPayment('${data.id}')">✏️</button>`
+                        : `<button class="btn btn-primary btn-sm" disabled style="pointer-events: none;">✏️</button>`
+                }  
+            </td>
                 </tr>
             `;
         });
@@ -619,4 +670,4 @@ document.addEventListener("DOMContentLoaded", function () {
     // Cargar honorarios al cargar la página
     loadHonorarios();
 });
-});
+

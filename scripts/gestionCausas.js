@@ -6,7 +6,17 @@ document.addEventListener('DOMContentLoaded', function () {
   // Verificar el rol del usuario y manejar los módulos visibles
   checkUserRole();
 
+});
+
 let honorariosTemporales = null; // Variable para almacenar los honorarios temporalmente
+
+// Verificar el rol del usuario
+const userRole = localStorage.getItem('userRole');
+console.log("Rol del usuario:", userRole);
+
+if (userRole !== "Administrador" && userRole !== "Asistente Administrativo" && userRole !== "Abogado") {
+    alert("No tienes permiso para acceder a este módulo.");
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Referencias a elementos del DOM
@@ -25,6 +35,39 @@ document.addEventListener('DOMContentLoaded', function () {
     const endDateInput = document.getElementById('endDate'); // Input para la fecha de fin
     const buscarButton = document.getElementById('buscar'); // Botón de búsqueda
 
+  
+    // Función para manejar restricciones de acceso según el rol del usuario
+    function applyRolePermissions() {
+        if (userRole === "Abogado") {
+            // Desactivar botón de agregar causa
+            if (addCauseButton) {
+                addCauseButton.style.display = 'none';
+            }
+
+            // Desactivar acciones en la tabla (editar y eliminar)
+            if (resultsTableBody) {
+                const actionButtons = resultsTableBody.querySelectorAll('.edit-button, .delete-button');
+                actionButtons.forEach(button => {
+                    button.disabled = true;
+                    button.style.pointerEvents = 'none';
+                    button.classList.add('disabled');
+                });
+            }
+        }
+    }
+
+    // Llamar a la función para aplicar restricciones de rol al cargar el contenido
+    applyRolePermissions();
+
+    // Eventos de manejo de acciones (solo si el usuario tiene permiso)
+    if (userRole !== "Abogado") {
+        addCauseButton.addEventListener('click', openAddCauseModal);
+        newCauseForm.addEventListener('submit', saveCause);
+        honorariosButton.addEventListener('click', openHonorariosModal);
+        honorariosForm.addEventListener('submit', submitHonorarios);
+    }
+
+  
     // Función para manejar cambios en los filtros
     function handleFilterChange() {
         const startDate = startDateInput.value || null;
@@ -713,46 +756,80 @@ document.addEventListener('DOMContentLoaded', function () {
     // Función para Cargar y Mostrar Causas
     async function loadCausas(startDate = null, endDate = null) {
         try {
+            console.log("Iniciando carga de causas...");
+    
             // Verifica y destruye cualquier instancia previa de DataTable
             if ($.fn.DataTable.isDataTable('#causasTable')) {
+                console.log("Reinicializando DataTable...");
                 $('#causasTable').DataTable().clear().destroy();
                 $('#causasTable tbody').empty();
             }
-
+    
             // Construir la consulta con los filtros aplicados
             let causasQuery = collection(db, "causas");
-
+            console.log("Consulta inicial construida...");
+    
             if (startDate) {
                 causasQuery = query(causasQuery, where("fechaIngreso", ">=", startDate));
+                console.log(`Filtro aplicado: fechaIngreso >= ${startDate}`);
             }
             if (endDate) {
                 causasQuery = query(causasQuery, where("fechaIngreso", "<=", endDate));
+                console.log(`Filtro aplicado: fechaIngreso <= ${endDate}`);
             }
-
+    
+            // Ejecutar la consulta
             const causasSnapshot = await getDocs(causasQuery);
+            console.log("Documentos obtenidos de Firestore:", causasSnapshot.docs.map(doc => doc.data()));
+    
+            if (causasSnapshot.empty) {
+                console.warn("No se encontraron documentos en la consulta.");
+                alert("No se encontraron causas para los filtros aplicados.");
+                return;
+            }
+    
             const rows = [];
-
+    
+            // Procesar cada documento en la consulta
             for (const causaDoc of causasSnapshot.docs) {
                 const causaData = causaDoc.data();
-
-                // Formatea la fecha en dd-mm-aa
+                console.log(`Procesando causa: ${JSON.stringify(causaData)}`);
+    
+                // Formatea la fecha en formato dd-mm-aaaa
                 const fecha = causaData.fechaIngreso
                     ? new Date(causaData.fechaIngreso).toLocaleDateString("es-CL", {
                         day: "2-digit",
                         month: "2-digit",
-                        year: "numeric", // Mostrar año completo (2024 en lugar de 24)
+                        year: "numeric", // Año completo
                     })
                     : "N/A";
-
+    
                 // Obtener datos de honorarios asociados
-                const honorariosSnapshot = await getDocs(
-                    query(collection(db, "honorarios"), where("rol", "==", causaData.rol))
-                );
-                const honorariosData = honorariosSnapshot.empty ? {} : honorariosSnapshot.docs[0].data();
-                const honorariosValue = honorariosData.monto
-                    ? `$${formatNumberWithThousandSeparator(honorariosData.monto)}`
-                    : "Sin Honorarios";
-
+                let honorariosValue = "Sin Honorarios";
+                try {
+                    const honorariosSnapshot = await getDocs(
+                        query(collection(db, "honorarios"), where("rol", "==", causaData.rol))
+                    );
+                    console.log(`Documentos encontrados en 'honorarios' para rol ${causaData.rol}: ${honorariosSnapshot.size}`);
+    
+                    if (!honorariosSnapshot.empty) {
+                        const honorariosData = honorariosSnapshot.docs[0].data();
+                        console.log(`Honorarios asociados: ${JSON.stringify(honorariosData)}`);
+                        honorariosValue = honorariosData.monto
+                            ? `$${formatNumberWithThousandSeparator(honorariosData.monto)}`
+                            : "Sin Honorarios";
+                    }
+                } catch (error) {
+                    console.warn(`Error al obtener honorarios para rol ${causaData.rol}:`, error);
+                }
+    
+                // Construir la fila para la tabla
+                const acciones =
+                    userRole !== "Abogado"
+                        ? `<button class="edit-button" onclick="editarCausa('${causaDoc.id}')">✏️</button>
+                           <button class="delete-button" onclick="eliminarCausa('${causaDoc.id}')">🗑️</button>`
+                        : `<button class="edit-button" disabled style="pointer-events: none;">✏️</button>`;
+    
                 rows.push([
                     causaData.rut || "N/A",
                     causaData.nombre || "N/A",
@@ -763,11 +840,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     causaData.tipoServicio || "N/A",
                     honorariosValue,
                     causaData.estado || "N/A",
-                    `<button class="edit-button" onclick="editarCausa('${causaDoc.id}')">✏️</button>
-                     <button class="delete-button" onclick="eliminarCausa('${causaDoc.id}')">🗑️</button>`,
+                    acciones,
                 ]);
             }
-
+    
+            console.log("Filas generadas para DataTable:", rows);
+    
             // Inicializar DataTable
             $('#causasTable').DataTable({
                 data: rows,
@@ -787,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 language: {
                     emptyTable: "No hay datos disponibles en la tabla",
                     lengthMenu: "Mostrar _MENU_ entradas",
-                    search: "Busqueda avanzada:",
+                    search: "Búsqueda avanzada:",
                     info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
                     paginate: {
                         first: "Primero",
@@ -801,10 +879,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 autoWidth: false,
             });
+    
+            console.log("DataTable inicializada correctamente.");
         } catch (error) {
             console.error("Error al cargar causas: ", error);
+            alert("Hubo un error al cargar las causas. Por favor, intente de nuevo.");
         }
     }
+    
 
 
     // Función para eliminar una causa
@@ -852,4 +934,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-});
+
