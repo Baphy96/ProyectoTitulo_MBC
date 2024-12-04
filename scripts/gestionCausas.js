@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Eventos de manejo de acciones (solo si el usuario tiene permiso)
     if (userRole !== "Abogado") {
         addCauseButton.addEventListener('click', openAddCauseModal);
-        newCauseForm.addEventListener('submit', saveCause);
         honorariosButton.addEventListener('click', openHonorariosModal);
         honorariosForm.addEventListener('submit', submitHonorarios);
     }
@@ -118,8 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inicialización de Eventos
     addCauseButton.addEventListener('click', openAddCauseModal);
-    window.addEventListener('click', closeModalOutside);
-    // newCauseForm.addEventListener('submit', saveCause);
+    window.addEventListener('click', closeModalOutside);    
     honorariosButton.addEventListener('click', openHonorariosModal);
     honorariosForm.addEventListener('submit', submitHonorarios);
 
@@ -496,7 +494,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 
-
     // Función para guardar los cambios de la edición o agregar una nueva causa
     newCauseForm.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -609,82 +606,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-
-    async function saveCause(event) {
-        event.preventDefault();
-
-        // Obtener y validar campos obligatorios
-        const id = newCauseForm.getAttribute('data-cause-id');  // Obtén el ID si está en modo edición
-        const rutCliente = document.getElementById('cliente').value;
-        const rolCausa = document.getElementById('rolCausa').value;
-        const nombrecliente = document.getElementById('cliente').selectedOptions[0].text;
-
-        if (!rutCliente || !rolCausa) {
-            alert("Por favor complete todos los campos obligatorios.");
-            return;
-        }
-
-        // Capturar valores de otros campos del formulario
-        const newOrUpdatedCause = {
-            demandado: document.getElementById('demandado').value,
-            nombre: nombrecliente,
-            rut: rutCliente,
-            rol: rolCausa,
-            fechaIngreso: document.getElementById('fechaIngreso').value,
-            tribunal: document.getElementById('tribunal').value,
-            abogadoResponsable: document.getElementById('abogadoResponsable').value,
-            estado: document.getElementById('estado').value,
-            tipoServicio: document.getElementById('tipoServicio').value,
-            receptorJudicial: document.getElementById('receptorJudicial').value,
-            abogadoCoordinador: document.getElementById('abogadoCoordinador').value,
-            asistentesLegales: Array.from(document.querySelectorAll('input[name="asistentesLegales"]:checked')).map(checkbox => checkbox.value)
-        };
-
-        try {
-            if (id) {
-                // Si existe un ID, actualiza la causa existente
-                const causeRef = doc(db, "causas", id);
-                await setDoc(causeRef, newOrUpdatedCause);  // Usa setDoc para actualizar o crear con el mismo ID
-                alert("Causa actualizada con éxito.");
-            } else {
-                // Si no existe un ID, agrega una nueva causa
-                await addDoc(collection(db, "causas"), newOrUpdatedCause);
-                alert("Causa agregada con éxito.");
-            }
-
-            // Manejo de honorarios si están en `honorariosTemporales`
-            if (honorariosTemporales) {
-                honorariosTemporales.rol = newOrUpdatedCause.rol;
-                const honorariosRef = collection(db, "honorarios");
-                const querySnapshot = await getDocs(query(honorariosRef, where("rol", "==", honorariosTemporales.rol)));
-
-                if (!querySnapshot.empty) {
-                    const honorarioDoc = querySnapshot.docs[0];
-                    await updateDoc(honorarioDoc.ref, honorariosTemporales);
-                    alert("Honorarios actualizados con éxito.");
-                } else {
-                    await addDoc(honorariosRef, honorariosTemporales);
-                    alert("Honorarios agregados con éxito.");
-                }
-                honorariosTemporales = null;
-            }
-
-            // Elimina el atributo de ID después de guardar
-            newCauseForm.removeAttribute('data-cause-id');
-
-            // Cerrar el modal y resetear el formulario
-            addCauseModal.style.display = 'none';
-            newCauseForm.reset();
-
-            // **Recargar la tabla inmediatamente**
-            await loadCausas();  // Recargar la tabla de causas
-
-        } catch (e) {
-            console.error("Error al guardar la causa y/o honorarios:", e);
-            alert("Hubo un error al guardar la causa y/o honorarios. Por favor, inténtelo de nuevo.");
-        }
-    }
 
     // Funciones para Honorarios
     async function openHonorariosModal() {
@@ -921,12 +842,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log("No se encontró la causa con el ID proporcionado.");
                     alert("La causa ya no existe.");
                 }
-            } catch (e) {
-                console.error("Error al eliminar la causa y/o honorarios:", e);
-                alert("Hubo un error al eliminar la causa. Por favor, inténtelo de nuevo.");
-            }
+            // Recargar la tabla de causas
+            await loadCausas(); // Asegúrate de que esta función esté implementada correctamente
+        } catch (e) {
+            console.error("Error al eliminar la causa y/o honorarios:", e);
+            alert("Hubo un error al eliminar la causa. Por favor, inténtelo de nuevo.");
         }
-    };
+    }
+};
 
 
     // Cargar causas al iniciar

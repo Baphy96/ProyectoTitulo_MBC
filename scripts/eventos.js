@@ -1,5 +1,5 @@
 import { db } from "../firebaseConfig.js"; // Importar Firestore configurado
-import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { checkUserRole } from './roleManager.js'; 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -12,6 +12,8 @@ const eventsCollection = collection(db, "eventos");
 const causasCollection = collection(db, "causas");
 
 let selectedDate = null; // Variable para almacenar la fecha seleccionada en el calendario
+
+
 
 // Función para cargar los valores del campo "rol" en el desplegable
 async function populateRoleDropdown() {
@@ -55,10 +57,16 @@ async function loadEvents(startDate = null, endDate = null) {
   const filteredEvents = []; // Eventos filtrados para el resumen
   const seenEventIds = new Set();
 
-  querySnapshot.forEach(doc => {
+  querySnapshot.forEach((doc) => {
     const event = { id: doc.id, ...doc.data() };
-    const eventDate = new Date(event.fecha);
-
+  
+    // Convertir fecha al formato local desde UTC si es necesario
+    const eventDate = new Date(event.fecha.endsWith("Z") ? event.fecha : `${event.fecha}T00:00:00`);
+    if (isNaN(eventDate.getTime())) {
+      console.warn("Fecha inválida, evento ignorado:", event);
+      return;
+    }      
+ 
     // Evitar duplicados
     if (seenEventIds.has(event.id)) {
       console.warn("Evento duplicado ignorado:", event);
@@ -77,6 +85,8 @@ async function loadEvents(startDate = null, endDate = null) {
     ) {
       filteredEvents.push(event);
 
+      
+
       // Agregar evento al resumen
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -86,6 +96,7 @@ async function loadEvents(startDate = null, endDate = null) {
               <td>${event.rol}</td>
           `;
       eventSummaryTable.appendChild(row);
+      console.log("Evento agregado al resumen:", event);
     }
   });
 
@@ -111,38 +122,38 @@ jQuery.extend(jQuery.fn.dataTable.ext.type.order, {
 
 // Función para inicializar DataTables
 function initializeDataTable() {
-  // Destruir instancia existente de DataTables si existe
-  if ($.fn.DataTable.isDataTable("#eventSummaryTable")) {
-    $("#eventSummaryTable").DataTable().destroy();
-  }
-
-  // Inicializar DataTables
-  $("#eventSummaryTable").DataTable({
-    order: [[0, "asc"]], // Ordena inicialmente por la primera columna (Fecha)
-    columnDefs: [
-      { type: "date-dd-mm-yyyy", targets: 0 } // Indica que la primera columna es de tipo fecha personalizada
-    ],
-    language: {
-      emptyTable: "No hay datos disponibles en la tabla",
-      lengthMenu: "Mostrar _MENU_ entradas por página",
-      zeroRecords: "No se encontraron coincidencias",
-      info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-      infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-      infoFiltered: "(filtrado de _MAX_ entradas totales)",
-      search: "Buscar:",
-      paginate: {
-        first: "Primero",
-        last: "Último",
-        next: "Siguiente",
-        previous: "Anterior",
+  // Verifica si DataTables ya está inicializado
+  if (!$.fn.DataTable.isDataTable("#eventSummaryTable")) {
+    $("#eventSummaryTable").DataTable({
+      order: [[0, "asc"]], // Ordena inicialmente por la primera columna (Fecha)
+      columnDefs: [
+        { type: "date-dd-mm-yyyy", targets: 0 } // Indica que la primera columna es de tipo fecha personalizada
+      ],
+      language: {
+        emptyTable: "No hay datos disponibles en la tabla",
+        lengthMenu: "Mostrar _MENU_ entradas por página",
+        zeroRecords: "No se encontraron coincidencias",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+        infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+        infoFiltered: "(filtrado de _MAX_ entradas totales)",
+        search: "Buscar:",
+        paginate: {
+          first: "Primero",
+          last: "Último",
+          next: "Siguiente",
+          previous: "Anterior",
+        },
+        loadingRecords: "Cargando...",
+        processing: "Procesando...",
       },
-      loadingRecords: "Cargando...",
-      processing: "Procesando...",
-    },
-    responsive: true,
-    autoWidth: false,
-  });
+      responsive: true,
+      autoWidth: false,
+    });
+  } else {
+    console.log("DataTable ya inicializado, no se requiere reinicialización.");
+  }
 }
+
 
 
 // Función principal para verificar eventos próximos
@@ -236,7 +247,8 @@ document.getElementById("applyFilterButton").addEventListener("click", async () 
 
     querySnapshot.forEach((doc) => {
       const event = { id: doc.id, ...doc.data() };
-      const eventDate = new Date(event.fecha);
+      const eventDate = new Date(event.fecha + "T00:00:00"); // Forzar inicio del día en zona horaria local
+      
 
       // Solo agregar eventos desde hoy hasta 2 meses adelante
       if (eventDate >= today && eventDate <= twoMonthsLater) {
@@ -283,8 +295,8 @@ document.getElementById("applyFilterButton").addEventListener("click", async () 
 // Inicializar eventos al cargar la página
 document.addEventListener("DOMContentLoaded", async () => {
   await populateRoleDropdown(); // Llenar el campo ROL / Año
-  await loadEvents(); // Cargar eventos en el resumen y calendario
-  await verificarEventosProximos(); // Verificar eventos próximos y mostrar toasts
+  await loadEvents(); // Cargar eventos en el resumen y calendario 
+   await verificarEventosProximos(); // Verificar eventos próximos y mostrar toasts
 });
 
 // Verificar eventos en intervalos regulares (opcional)
@@ -296,20 +308,26 @@ setInterval(() => {
 // Función para agregar un nuevo evento
 async function addEvent(eventData) {
   try {
-    // Asegurarte de que la fecha se almacene en UTC
-    const utcDate = new Date(eventData.fecha).toISOString(); // Convertir a formato UTC
-    const eventDataWithUTC = {
+    const simpleDate = new Date(eventData.fecha).toISOString().split("T")[0];
+    const eventDataFormatted = {
       ...eventData,
-      fecha: utcDate,
+      fecha: simpleDate,
+      tipo: eventData.tipo.trim(),
     };
 
-    await addDoc(eventsCollection, eventDataWithUTC);
-    alert("Evento agregado correctamente.");
-    await loadEvents(); // Recargar eventos en el resumen y calendario
+    await addDoc(eventsCollection, eventDataFormatted);
+    alert("Evento guardado con éxito.");
+
+    // Recargar la tabla completa para evitar inconsistencias
+    await loadEvents();
+
   } catch (error) {
     console.error("Error al agregar evento:", error);
+    alert("No se pudo guardar el evento. Intente nuevamente.");
   }
 }
+
+
 
 // Función para actualizar un evento
 async function updateEvent(eventId, updatedData) {
@@ -344,6 +362,7 @@ async function deleteEvent(eventId) {
     const eventRef = doc(eventsCollection, eventId); // Referencia al documento
     await deleteDoc(eventRef); // Eliminar el evento de Firestore
     alert("Evento eliminado correctamente."); // Notificar al usuario
+
     await loadEvents(); // Recargar eventos en el calendario y resumen
     console.log("Evento eliminado con ID:", eventId); // Registro de confirmación
   } catch (error) {
@@ -359,6 +378,7 @@ function populateCalendar(events) {
   const today = new Date(); // Fecha actual
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
+    timeZone: "local", // Usa la zona horaria local del cliente
     initialView: "dayGridMonth", // Vista inicial del calendario
     locale: "es", // Idioma en español
     headerToolbar: {
@@ -375,7 +395,7 @@ function populateCalendar(events) {
     editable: true, // Permitir mover eventos
     selectable: true, // Permitir seleccionar fechas
     events: events.map((event) => {
-      const eventDate = new Date(event.fecha);
+      const eventDate = new Date(event.fecha + "T00:00:00"); // Convertir a inicio del día en zona local
       let eventClass = "";
 
       // Asignar clase según el tipo de evento
