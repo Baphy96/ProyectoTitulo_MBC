@@ -18,7 +18,11 @@
 }
 
 .sidebar.collapsed h2 {
-    display: none; /* Oculta el título */
+    display: block; /* Mantener el título del rol del usuario visible */
+    font-size: 1rem;
+    color: #f1f1f1;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .sidebar.collapsed ul li a span {
@@ -29,32 +33,18 @@
     margin-left: 70px; /* Ajuste del margen del contenido */
 }
 
-/* === Ajustes para Pantallas Pequeñas === */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 60px; /* Reducir ancho */
-        padding: 20px 5px; /* Ajustar padding */
-    }
+/* ===  Estilo general para botones del sidebar === */
+.sidebar-button {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
 
-    .sidebar h2 {
-        display: none; /* Ocultar título */
-    }
-
-    .sidebar ul li a {
-        justify-content: center; /* Centrar los íconos */
-    }
-
-    .sidebar ul li a span {
-        display: none; /* Ocultar texto */
-    }
-
-    .sidebar ul li a i {
-        margin-right: 0; /* Eliminar margen del ícono */
-    }
-
-    .main-content {
-        margin-left: 60px; /* Ajuste del contenido */
-    }
+.sidebar-button i {
+    margin-right: 8px;
 }
 
 /* === Título de la Barra Lateral === */
@@ -119,8 +109,113 @@
 }
 
 .footer a:hover {
-    color: #ddd;
+    color: #f3efef;
 }
+
+/* === Media Queries === */
+
+/* === Ajustes para Pantallas Pequeñas === */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px; /* Reducir ancho */
+        padding: 20px 5px; /* Ajustar padding */
+    }
+
+    .sidebar h2 {
+        display: block; /* Mostrar título para mantener el rol del usuario visible */
+        font-size: 0.9rem;
+        white-space: nowrap; /* Evitar el desbordamiento del texto */
+        overflow: hidden;
+        text-overflow: ellipsis; /* Mostrar puntos suspensivos si el texto es muy largo */
+    }
+    
+    .sidebar ul li {
+        margin-bottom: 10px; /* Reducir espacio entre elementos para asegurar visibilidad */
+    }
+
+    .sidebar ul li a {
+        justify-content: center; /* Centrar los íconos */
+    }
+
+    .sidebar ul li a span {
+        display: none; /* Ocultar texto */
+    }
+
+    .sidebar ul li a i {
+        margin-right: 0; /* Eliminar margen del ícono */
+    }
+
+    .main-content {
+        margin-left: 60px; /* Ajuste del contenido */
+    }
+}
+/* === Ajustes para Pantallas Medianas === */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 200px; /* Ajustar ancho para asegurar visibilidad de los botones */
+        padding: 20px 10px; /* Ajustar padding */
+    }
+
+    .sidebar h2 {
+        font-size: 1.2rem; /* Ajustar el tamaño del título */
+    }
+
+    .sidebar ul li {
+        margin-bottom: 20px; /* Reducir espacio entre elementos para asegurar visibilidad */
+    }
+
+    .sidebar ul li a {
+        justify-content: flex-start; /* Alinear íconos y texto */
+    }
+
+    .sidebar ul li a span {
+        display: inline; /* Mostrar texto */
+        font-size: 1rem; /* Ajustar tamaño del texto */
+    }
+
+    .sidebar ul li a i {
+        margin-right: 10px; /* Agregar margen al ícono */
+    }
+
+    .main-content {
+        margin-left: 200px; /* Ajuste del contenido */
+    }
+}
+
+
+/* === Ajustes para Pantallas Grandes === */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 250px; /* Ancho grande */
+        padding: 20px 20px; /* Ajustar padding */
+    }
+
+    .sidebar h2 {
+        font-size: 1.5rem; /* Título más grande */
+    }
+
+    .sidebar ul li {
+        margin-bottom: 20px; /* Reducir espacio entre elementos para asegurar visibilidad de los 3 botones */
+    }
+
+    .sidebar ul li a {
+        justify-content: flex-start; /* Alinear íconos y texto */
+    }
+
+    .sidebar ul li a span {
+        display: inline; /* Mostrar texto */
+        font-size: 1rem; /* Ajustar tamaño del texto */
+    }
+
+    .sidebar ul li a i {
+        margin-right: 15px; /* Agregar margen al ícono */
+    }
+
+    .main-content {
+        margin-left: 250px; /* Ajuste del contenido */
+    }
+}
+
 
 
 /* ====================  CSS para el Chatbot Modal" ====================*/

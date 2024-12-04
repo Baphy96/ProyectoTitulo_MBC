@@ -3,8 +3,7 @@ import { checkUserRole } from './roleManager.js';
 document.addEventListener('DOMContentLoaded', function () {
     // Verificar el rol del usuario y manejar los módulos visibles
     checkUserRole();
-    manageMenuVisibility(); // Mostrar módulos según el rol
-    setupDropdownMenu(); // Configurar el menú desplegable
+    manageMenuVisibility(); // Mostrar módulos según el rol   
     setupLogoutButtons(); // Configurar botones de cierre de sesión
 });
 
@@ -63,26 +62,6 @@ function manageMenuVisibility() {
     }
 }
 
-// Configuración del menú desplegable
-function setupDropdownMenu() {
-    const dropdownToggle = document.getElementById('dropdown-toggle');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function () {
-            dropdownMenu.classList.toggle('show');
-        });
-
-        // Cerrar el menú si se hace clic fuera de él
-        window.addEventListener('click', function (event) {
-            if (!event.target.matches('#dropdown-toggle') && !event.target.closest('.user-info')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-    } else {
-        console.warn("No se encontró el menú desplegable o su botón de activación.");
-    }
-}
 
 // Configuración de los botones de cerrar sesión
 function setupLogoutButtons() {
