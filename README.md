@@ -100,7 +100,7 @@ Tras recibir el correo de restablecimiento, la nueva contraseña debe cumplir co
     - Prettier: Para formatear el código automáticamente.
 - Configura un Live Preview
     - Instala la extensión Live Preview desde el VS Code.
-    - Haz clic derecho en el archivo HTML principal (por ejemplo, index.html) y selecciona Open with Live Preview para probar la interfaz en tu navegador.
+    - Haz clic derecho en el archivo HTML principal (por ejemplo, index.html) y selecciona Show Preview para probar la interfaz.
 
 
 **Tecnologías Utilizadas**
