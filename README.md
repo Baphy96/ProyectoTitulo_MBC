@@ -20,7 +20,7 @@ Al centralizar y optimizar estos procesos, el sistema permite a las empresas con
 
 **Estado del Proyecto**
 
-Actualmente, el sistema se encuentra en la versión 1.0.0 y se está probando en entornos locales. Se están incorporando mejoras continuas, como la optimización de las interfaces y la seguridad de los datos.
+Actualmente, el sistema se encuentra en la versión 3.0 y se está probando en entornos locales. Se están incorporando mejoras continuas, como la optimización de las interfaces y la seguridad de los datos.
 
 **Requisitos del Entorno de Desarrollo**
 - Navegador Web: Chrome, Firefox, u otro navegador moderno.
@@ -101,7 +101,6 @@ Tras recibir el correo de restablecimiento, la nueva contraseña debe cumplir co
 - Configura un Live Preview
     - Instala la extensión Live Preview desde el VS Code.
     - Haz clic derecho en el archivo HTML principal (por ejemplo, index.html) y selecciona Show Preview para probar la interfaz.
-
 
 **Tecnologías Utilizadas**
 
