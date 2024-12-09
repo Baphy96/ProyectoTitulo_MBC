@@ -1,4 +1,4 @@
-/* === Estilos Generales de la Barra Lateral === */
+/* Estilos Generales de la Barra Lateral */
 .sidebar {
     position: fixed;
     width: 250px;
@@ -12,7 +12,7 @@
     transition: width 0.3s ease, transform 0.3s ease;
 }
 
-/* === Estado Colapsado de la Barra Lateral === */
+/* Estado Colapsado de la Barra Lateral */
 .sidebar.collapsed {
     width: 70px; /* Solo muestra íconos */
 }
@@ -33,7 +33,7 @@
     margin-left: 70px; /* Ajuste del margen del contenido */
 }
 
-/* ===  Estilo general para botones del sidebar === */
+/* Estilo general para botones del sidebar  */
 .sidebar-button {
     display: flex;
     align-items: center;
@@ -47,7 +47,7 @@
     margin-right: 8px;
 }
 
-/* === Título de la Barra Lateral === */
+/*  Título de la Barra Lateral */
 .sidebar h2 {
     font-size: 1.5em;
     margin-bottom: 40px;
@@ -55,7 +55,7 @@
     color: #f1f1f1;
 }
 
-/* === Lista de Enlaces === */
+/* Lista de Enlaces */
 .sidebar ul {
     list-style: none;
     padding: 0;

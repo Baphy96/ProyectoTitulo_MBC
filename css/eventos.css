@@ -26,8 +26,6 @@ header {
     /* Reducir el ancho horizontal */
 }
 
-
-
 .tooltip-event {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.8);
@@ -118,7 +116,7 @@ header {
     /* Cambia de color al pasar el mouse */
 }
 
-/* Barra de desplazmiento  */
+/* Barra de desplazmiento */
 .table-container {
     overflow-x: auto;
     /* Permitir desplazamiento horizontal */

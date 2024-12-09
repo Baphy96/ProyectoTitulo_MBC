@@ -13,8 +13,6 @@ const causasCollection = collection(db, "causas");
 
 let selectedDate = null; // Variable para almacenar la fecha seleccionada en el calendario
 
-
-
 // Función para cargar los valores del campo "rol" en el desplegable
 async function populateRoleDropdown() {
   const roleDropdown = document.getElementById("eventRole");

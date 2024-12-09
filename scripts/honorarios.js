@@ -278,18 +278,20 @@ applyRolePermissions();
         }).format(value);
     }
 
-    // Mostrar el modal con datos dinámicos
+    // Función para abrir el modal de pagos para un cliente específico
     window.openPaymentModal = function (rutCliente, nombreCliente, groupIndex) {
         currentGroupIndex = groupIndex; // Actualiza el índice actual del grupo
 
+         // Obtiene los documentos asociados al grupo de honorarios
         const documentos = honorarioGroups[groupIndex];
 
+        // Si no hay documentos en el grupo, muestra un mensaje en la consola y termina la ejecución
         if (!documentos) {
             console.error("No se encontraron documentos para el grupo:", groupIndex);
             return;
         }
 
-        // Reiniciar los campos del modal
+        // Limpia y reinicia los campos del formulario del modal
         document.getElementById("fechaPago").value = "";
         document.getElementById("tipoPago").value = "";
         document.getElementById("numDocumentoPago").value = "";
@@ -298,15 +300,19 @@ applyRolePermissions();
         document.getElementById("modalClienteRUT").textContent = rutCliente;
         document.getElementById("modalClienteNombre").textContent = nombreCliente;
 
+        // Limpia las filas existentes en la tabla de pagos
         const paymentTableBody = document.getElementById("paymentTableBody");
         paymentTableBody.innerHTML = ""; // Limpia las filas previas
 
+         // Recorre los documentos y genera una fila para cada uno
         documentos.forEach((doc) => {
+            // Calcula el saldo restante: monto total menos los pagos realizados
             const monto = parseFloat(doc.monto || 0);
             const pagos = doc.pagos || []; // Asegúrate de cargar los pagos existentes
             const totalPagos = pagos.reduce((sum, pago) => sum + (parseFloat(pago.monto) || 0), 0); // Suma de abonos
             const saldo = monto - totalPagos;
 
+             // Formatea la fecha del documento en formato 'dd-mm-aaaa', o muestra 'N/A' si no hay fecha
             const fecha = doc.fechaDocumento
                 ? new Date(doc.fechaDocumento).toLocaleDateString("es-CL", {
                     day: "2-digit",
@@ -315,6 +321,7 @@ applyRolePermissions();
                 })
                 : "N/A";
 
+            // Agrega una nueva fila a la tabla con los datos del documento
             paymentTableBody.innerHTML += `
                 <tr>
                     <td>${fecha}</td>
