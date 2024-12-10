@@ -38,7 +38,30 @@ header {
         padding-bottom: 10px; /* Espaciado adicional debajo de la tabla */
     }
 
-/* Boton exportar */
+/* Boton exportar reportes*/
+/* Ajustar el ancho del menú desplegable */
+#exportar-menu {
+    min-width: 120px; /* Establece un ancho mínimo más pequeño */
+    max-width: 150px; /* Opcional: limita el ancho máximo */
+    font-size: 0.8rem; /* Reduce el tamaño de la fuente */
+    padding: 4px 0; /* Reduce el espacio vertical */
+}
+
+/* Ajustar los elementos del menú */
+#exportar-menu .dropdown-item {
+    padding: 4px 8px; /* Reduce el espacio interno de los ítems */
+    font-size: 0.75rem; /* Ajusta el tamaño del texto */
+    text-align: center; /* Centra el texto */
+}
+
+/* Opcional: Sombra y bordes más compactos */
+#exportar-menu {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra más ligera */
+    border-radius: 3px; /* Bordes ligeramente redondeados */
+}
+
+
+/* Boton exportar graficos*/
 .exportar-btn-top-right {
     position: absolute;
     top: 10px; /* Ajusta la distancia desde el borde superior */
