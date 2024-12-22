@@ -1,11 +1,34 @@
 import { db } from "../firebaseConfig.js"; // Importar Firestore configurado
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"; // Importar funciones necesarias
-import { checkUserRole } from './roleManager.js'; 
+import { validateAccess } from './roleManager.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Verificar el rol del usuario y manejar los módulos visibles
-  checkUserRole();
+    // Validar acceso antes de ejecutar cualquier lógica
+    if (validateAccess(["Administrador", "Asistente Administrativo"])) {
+        console.log("Acceso permitido. Cargando módulo de reportes...");
+        loadReportesContent();
+    } else {
+        console.log("Acceso denegado. No se ejecutará ninguna lógica.");
+    }
 });
+
+// Función principal para cargar el contenido de reportes
+function loadReportesContent() {
+    console.log("Cargando contenido de reportes...");
+
+    // Obtener y mostrar datos solo si el usuario tiene permisos
+    const reportesRef = collection(db, "reportes");
+    getDocs(query(reportesRef))
+        .then(snapshot => {
+            snapshot.docs.forEach(doc => {
+                console.log("Reporte:", doc.data());
+                // Aquí renderizas los datos en tu HTML
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar reportes:", error.message);
+        });
+}
 
 // Lógica para alternar pestañas
 document.addEventListener("DOMContentLoaded", () => {

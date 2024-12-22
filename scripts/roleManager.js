@@ -1,15 +1,40 @@
-export function checkUserRole() {
-    // Verificar el rol del usuario desde localStorage
+// Función para validar el acceso basado en roles
+export function validateAccess(requiredRoles = []) {
     const userRole = localStorage.getItem('userRole');
     console.log("Rol del usuario:", userRole);
 
+    // Si no hay rol, redirigir
     if (!userRole) {
         alert("No se encontró el rol del usuario. Redirigiendo...");
-        window.location.href = "../index.html"; // Redirigir si no hay rol
+        window.location.href = "../index.html";
+        return false;
+    }
+
+    // Si el rol no está permitido, redirigir
+    if (!requiredRoles.includes(userRole)) {
+        alert("No tienes permiso para acceder a esta página.");
+        window.location.href = "../index.html";
+        return false;
+    }
+
+    console.log("Acceso permitido para el rol:", userRole);
+    return true; // El rol es válido
+}
+
+// Función para mostrar módulos según el rol del usuario
+export function checkUserRole() {
+    const userRole = localStorage.getItem('userRole');
+
+    // Si no hay rol, redirigir
+    if (!userRole) {
+        alert("No se encontró el rol del usuario. Redirigiendo...");
+        window.location.href = "../index.html";
         return;
     }
 
-    // Definir módulos visibles para cada rol
+    console.log("Rol del usuario:", userRole);
+
+    // Definir módulos visibles por rol
     const roleModules = {
         "Administrador": [
             "main-gestion-causas",
@@ -30,7 +55,7 @@ export function checkUserRole() {
             "main-eventos"
         ]
     };
-
+    
     // Ocultar todos los módulos inicialmente
     const allModules = document.querySelectorAll("[id^='main-']");
     allModules.forEach(module => {

@@ -1,11 +1,35 @@
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import {  db } from "../firebaseConfig.js";
-import { checkUserRole } from './roleManager.js'; 
+import { validateAccess } from './roleManager.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Verificar el rol del usuario y manejar los módulos visibles
-  checkUserRole();
+    // Validar acceso antes de ejecutar cualquier lógica
+    if (validateAccess(["Administrador"])) {
+        console.log("Acceso permitido. Cargando módulo de mantenedores...");
+        loadMantenedoresContent();
+    } else {
+        console.log("Acceso denegado. No se ejecutará ninguna lógica.");
+    }
 });
+
+// Función principal para cargar el contenido de mantenedores
+function loadMantenedoresContent() {
+    console.log("Cargando contenido de mantenedores...");
+
+    // Ejecutar consulta solo si el rol fue validado
+    const mantenedoresRef = collection(db, "mantenedores");
+
+    getDocs(query(mantenedoresRef))
+        .then(snapshot => {
+            snapshot.docs.forEach(doc => {
+                console.log("Mantenedor:", doc.data());
+                // Aquí renderizas los datos en tu HTML
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar mantenedores:", error.message);
+        });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Referencias a botones y elementos del DOM

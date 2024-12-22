@@ -7,8 +7,9 @@
     left: 0;
     background-color: #2c2c2c;
     z-index: 1000;
-    padding: 25px; /* Añade separación interna */
+    padding: 10px 15px;/* Añade separación interna */
     box-sizing: border-box; /* Asegura que el padding no afecte el tamaño */
+    overflow-y: auto;
     transition: width 0.3s ease, transform 0.3s ease;
 }
 
@@ -93,13 +94,14 @@
 
 /* === Footer de la Barra Lateral === */
 .footer {
-    position: absolute; /* Posiciona el footer respecto a la barra lateral */
-    bottom: 20px; /* Separa el footer del borde inferior */
+    position: absolute;
+    bottom: 0; /* Fijado al final del sidebar */
+    left: 0;
+    width: 100%;
+    padding: 10px 0;
     text-align: left;
     color: gray;
-    font-size: 0.9em;
-    margin-top: auto; /* Empuja el footer al fondo */
-    padding-top: 150px; /* Espacio adicional sobre los botones */
+    font-size: 0.9em;    
 }
 
 .footer a {
@@ -119,8 +121,8 @@
 /* === Ajustes para Pantallas Pequeñas === */
 @media (max-width: 768px) {
     .sidebar {
-        width: 60px; /* Reducir ancho */
-        padding: 20px 5px; /* Ajustar padding */
+        width: 70px; /* Reducir ancho */
+        padding: 5px; /* Ajustar padding */
     }
 
     .sidebar h2 {
