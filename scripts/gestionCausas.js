@@ -168,6 +168,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
 
                 try {
+                    // Validar si el RUT ya existe con un nombre diferente
+                    const isUnique = await validateUniqueRut(nuevaEntidad.Rut, nuevaEntidad.Nombre);
+                    if (!isUnique) {
+                        alert("El RUT ingresado ya existe con un nombre diferente en el sistema.");
+                        return;
+                    }
+        
                     // Agregar la entidad al Firestore
                     await addDoc(collection(db, "Entidades"), nuevaEntidad);
                     alert("Entidad agregada con éxito.");
@@ -259,42 +266,50 @@ document.addEventListener('DOMContentLoaded', function () {
     // Funciones de Formulario y Validación
     function validateForm() {
         let isValid = true;
-
-        // Validación del RUT
+    
+        // Obtener valores del formulario
         const rut = document.getElementById('entityRut').value;
+        const nombre = document.getElementById('entityName').value;
+        const direccion = document.getElementById('entityAddress').value;
+        const telefono = document.getElementById('entityPhone').value;
+        const correo = document.getElementById('entityEmail').value;
+    
+        // Validación del RUT
         if (!/^[0-9]{7,8}-[0-9kK]$/.test(rut) || !validateRut(rut)) {
             alert('RUT inválido. Debe seguir el formato 12345678-K.');
             isValid = false;
         }
-
+    
         // Validación del Nombre
-        const nombre = document.getElementById('entityName').value;
         if (nombre.trim().length < 3) {
             alert('El nombre es requerido y debe tener al menos 3 caracteres.');
             isValid = false;
         }
-
+    
         // Validación de la Dirección
-        const direccion = document.getElementById('entityAddress').value;
         if (direccion.trim().length < 5) {
             alert('La dirección es requerida y debe tener al menos 5 caracteres.');
             isValid = false;
         }
-
+    
         // Validación del Teléfono
-        const telefono = document.getElementById('entityPhone').value;
         if (!/^[0-9]{9}$/.test(telefono)) {
             alert('El teléfono debe tener 9 dígitos.');
             isValid = false;
         }
-
+    
         // Validación del Correo Electrónico
-        const correo = document.getElementById('entityEmail').value;
         if (!/\S+@\S+\.\S+/.test(correo)) {
             alert('Correo inválido. Por favor ingrese un correo electrónico válido.');
             isValid = false;
         }
-
+    
+        // Validación del RUT único con el mismo nombre
+        if (!validateUniqueRut(rut, nombre)) {
+            alert('El RUT ingresado ya existe con un nombre diferente en el sistema.');
+            isValid = false;
+        }
+    
         return isValid;
     }
 
@@ -314,6 +329,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const dvFinal = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
         return dvFinal.toLowerCase() === dv.toLowerCase();
     }
+
+// Validación para asegurar que el RUT no se ingrese dos veces con distinto nombre
+async function validateUniqueRut(rut, nombre) {
+    try {
+        const q = query(collection(db, "Entidades"), where("Rut", "==", rut));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const docData = querySnapshot.docs[0].data();
+            if (docData.Nombre !== nombre) {
+                // El RUT existe pero con un nombre diferente
+                return false;
+            }
+        }
+        return true; // No hay conflicto
+    } catch (e) {
+        console.error("Error al validar el RUT único:", e);
+        return false; // Asumir conflicto en caso de error
+    }
+}
+
 
     async function loadDropdownOptions() {
         try {
