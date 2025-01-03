@@ -1,6 +1,6 @@
 import { db } from "../firebaseConfig.js"; // Importar Firestore configurado
 import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-import { checkUserRole } from './roleManager.js'; 
+import { checkUserRole } from './roleManager.js';
 
 document.addEventListener('DOMContentLoaded', function () {
   // Verificar el rol del usuario y manejar los módulos visibles
@@ -57,14 +57,14 @@ async function loadEvents(startDate = null, endDate = null) {
 
   querySnapshot.forEach((doc) => {
     const event = { id: doc.id, ...doc.data() };
-  
+
     // Convertir fecha al formato local desde UTC si es necesario
-    const eventDate = new Date(event.fecha.endsWith("Z") ? event.fecha : `${event.fecha}T00:00:00`);
+    const eventDate = new Date(`${event.fecha}T00:00:00`);
     if (isNaN(eventDate.getTime())) {
       console.warn("Fecha inválida, evento ignorado:", event);
       return;
-    }      
- 
+    }
+
     // Evitar duplicados
     if (seenEventIds.has(event.id)) {
       console.warn("Evento duplicado ignorado:", event);
@@ -83,13 +83,12 @@ async function loadEvents(startDate = null, endDate = null) {
     ) {
       filteredEvents.push(event);
 
-      
 
       // Agregar evento al resumen
       const row = document.createElement("tr");
       row.innerHTML = `
 
-          <td>${eventDate.toLocaleDateString()}</td>
+      <td>${eventDate.toLocaleDateString("es-CL")}</td>
               <td>${event.tipo}</td>
               <td>${event.rol}</td>
           `;
@@ -158,7 +157,8 @@ function initializeDataTable() {
 async function verificarEventosProximos() {
   const eventosProximos = []; // Array para almacenar eventos próximos
   const hoy = new Date();
-  const tresDiasDespues = new Date();
+  hoy.setHours(0, 0, 0, 0); // Asegurarse de usar la medianoche
+  const tresDiasDespues = new Date(hoy);
   tresDiasDespues.setDate(hoy.getDate() + 3); // Rango de 3 días
 
   try {
@@ -167,14 +167,20 @@ async function verificarEventosProximos() {
 
     eventosSnapshot.forEach((doc) => {
       const evento = doc.data();
-      const fechaEvento = new Date(evento.fecha);
 
-      // Verificar si el evento está dentro del rango de los próximos 3 días
+      // Convertir la fecha almacenada en UTC a un objeto Date local
+      const fechaEvento = new Date(`${evento.fecha}T00:00:00Z`);
+      fechaEvento.setHours(0, 0, 0, 0);
+      if (isNaN(fechaEvento.getTime())) {
+        console.warn("Fecha inválida encontrada en el evento:", evento);
+        return; // Ignorar eventos con fechas inválidas
+      }
+
+      // Verificar si la fecha del evento está dentro del rango de los próximos 3 días
       if (fechaEvento >= hoy && fechaEvento <= tresDiasDespues) {
-        eventosProximos.push({ id: doc.id, ...evento });
+        eventosProximos.push({ id: doc.id, ...evento, fechaEvento });
       }
     });
-
 
     // Mostrar notificaciones para los eventos encontrados
     mostrarNotificaciones(eventosProximos);
@@ -196,21 +202,23 @@ function mostrarNotificaciones(eventos) {
 function mostrarToast(evento) {
   const toastContainer = document.getElementById("toastContainer");
 
+  // No uses conversión adicional con toLocaleDateString si ya tienes la fecha como string en formato ISO.
+  const fechaFormateada = new Date(`${evento.fecha}T00:00:00`).toLocaleDateString("es-CL");
+
   const toastHTML = `
-  <div class="toast align-items-center text-bg-warning border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
-  <div class="toast-header">
-      <strong class="me-auto">Próximo evento</strong>
-      <!-- Botón de cierre -->
-      <button type="button" class="close toast-close" aria-label="Cerrar">
+    <div class="toast align-items-center text-bg-warning border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+      <div class="toast-header">
+        <strong class="me-auto">Próximo evento</strong>
+        <button type="button" class="close toast-close" aria-label="Cerrar">
           <span aria-hidden="true">&times;</span>
-      </button>
-  </div>
-  <div class="toast-body">
-              <strong>${evento.tipo}</strong> programado para el <em>${new Date(evento.fecha).toLocaleDateString()}</em>.<br>
-              <strong>ROL:</strong> ${evento.rol} <br>
-              ${evento.descripcion || ""}
-          </div>
+        </button>
       </div>
+      <div class="toast-body">
+        <strong>${evento.tipo}</strong> programado para el <em>${fechaFormateada}</em>.<br>
+        <strong>ROL:</strong> ${evento.rol} <br>
+        ${evento.descripcion || ""}
+      </div>
+    </div>
   `;
 
   // Agregar el toast al contenedor
@@ -218,11 +226,11 @@ function mostrarToast(evento) {
 
   // Inicializar y mostrar el toast
   const toastEl = toastContainer.lastElementChild;
-  $(toastEl).toast({ autohide: false }).toast("show"); // Mostrar el toast con jQuery
+  $(toastEl).toast({ autohide: false }).toast("show");
 
   // Agregar evento de cierre manual
   toastEl.querySelector(".toast-close").addEventListener("click", () => {
-    $(toastEl).toast("hide"); // Ocultar el toast al hacer clic en el botón de cierre
+    $(toastEl).toast("hide");
   });
 }
 
@@ -246,7 +254,7 @@ document.getElementById("applyFilterButton").addEventListener("click", async () 
     querySnapshot.forEach((doc) => {
       const event = { id: doc.id, ...doc.data() };
       const eventDate = new Date(event.fecha + "T00:00:00"); // Forzar inicio del día en zona horaria local
-      
+
 
       // Solo agregar eventos desde hoy hasta 2 meses adelante
       if (eventDate >= today && eventDate <= twoMonthsLater) {
@@ -294,7 +302,7 @@ document.getElementById("applyFilterButton").addEventListener("click", async () 
 document.addEventListener("DOMContentLoaded", async () => {
   await populateRoleDropdown(); // Llenar el campo ROL / Año
   await loadEvents(); // Cargar eventos en el resumen y calendario 
-   await verificarEventosProximos(); // Verificar eventos próximos y mostrar toasts
+  await verificarEventosProximos(); // Verificar eventos próximos y mostrar toasts
 });
 
 // Verificar eventos en intervalos regulares (opcional)
